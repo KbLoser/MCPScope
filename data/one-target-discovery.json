@@ -1,0 +1,81 @@
+{
+  "status": "success",
+  "transport": "streamable-http",
+  "endpoint": "https://mcp.docs.gameanalytics.com/mcp",
+  "command": null,
+  "protocolVersion": "2025-11-25",
+  "sessionId": null,
+  "serverInfo": {
+    "name": "gameanalytics-docs",
+    "version": "1.0.0"
+  },
+  "serverCapabilities": {
+    "tools": {
+      "listChanged": true
+    }
+  },
+  "toolCount": 2,
+  "pages": 1,
+  "tools": [
+    {
+      "name": "docs_search",
+      "description": "Search the documentation for relevant pages. Returns matching documents with URLs, snippets, and relevance scores. Use this to find information across all documentation.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The search query string"
+          },
+          "limit": {
+            "default": 16,
+            "description": "Maximum number of results to return (1-20, default: 16)",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "docs_fetch",
+      "description": "Fetch the complete content of a documentation page. Use this after searching to get the full markdown content of a specific page.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The full URL of the page to fetch (e.g., \"https://docs.example.com/docs/getting-started\")"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    }
+  ],
+  "warnings": [],
+  "durationMs": 1635,
+  "fetchedAt": "2026-08-10T10:36:07.933Z",
+  "attempts": [
+    {
+      "transport": "streamable-http",
+      "url": "https://mcp.docs.gameanalytics.com/mcp",
+      "status": "success",
+      "durationMs": 1635
+    }
+  ]
+}

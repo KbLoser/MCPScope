@@ -1,0 +1,561 @@
+{
+  "status": "success",
+  "transport": "sse",
+  "endpoint": "https://mcp.gab.sale/sse",
+  "command": null,
+  "protocolVersion": "2025-11-25",
+  "sessionId": null,
+  "serverInfo": {
+    "name": "sellfox-api",
+    "version": "1.27.0"
+  },
+  "serverCapabilities": {
+    "experimental": {},
+    "tools": {
+      "listChanged": false
+    }
+  },
+  "toolCount": 21,
+  "pages": 1,
+  "tools": [
+    {
+      "name": "call_sellfox_api",
+      "description": "调用赛狐 ERP 的任意 API 接口。\n示例：call_sellfox_api('查询FBA库存明细', {'pageNo': 1, 'pageSize': 20})",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "api_name": {
+            "type": "string",
+            "description": "接口名称、路径或关键词"
+          },
+          "params": {
+            "type": "object",
+            "description": "请求参数"
+          }
+        },
+        "required": [
+          "api_name"
+        ]
+      }
+    },
+    {
+      "name": "list_sellfox_apis",
+      "description": "列出赛狐所有可用 API。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "describe_sellfox_api",
+      "description": "查看指定赛狐 API 的参数与响应结构。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "api_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "api_name"
+        ]
+      }
+    },
+    {
+      "name": "get_product_window",
+      "description": "[window] 父 ASIN 的滚动 N 天聚合数据（来自 product_analysis_window）。\n每行 = 截至 window_end_date 的近 window_days 天累计（默认 30）。\n返回字段含订单/销额/会话/广告/利润/库存/退款/评分。\n适用：F3 产品分析、S06 多变体、跨日趋势对比。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "get_product_profit_window",
+      "description": "[window] 父 ASIN 的滚动窗口毛利数据（来自 sales_profit_window）。\n返回毛利、毛利率、采购/平台佣金/FBA 仓储/广告各档花费。\n适用：F1 利润计算、break-even ACoS 反推。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "get_campaign_daily",
+      "description": "[daily] 广告活动级日报（ad_campaign_daily）。\n通过 ad_product_daily 把 parent_asin 反推到关联 campaign_id 后过滤。\n返回花费/点击/orders_7d/ACOS/ROAS/CPC。适用：F6、S04。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          },
+          "auto_summarize": {
+            "type": "boolean",
+            "description": "True 时按业务粒度聚合返回（CVR/ACOS/CPA），避免大窗口爆上下文。默认 False。"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "get_ad_group_daily",
+      "description": "[daily] 广告组级日报（ad_group_daily）。\n用 parent_asin 关联的 campaign_id 集合过滤。返回组级花费/转化/CVR。\n适用：S04 SKAG 验证。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          },
+          "auto_summarize": {
+            "type": "boolean",
+            "description": "True 时按业务粒度聚合返回（CVR/ACOS/CPA），避免大窗口爆上下文。默认 False。"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "get_search_term_daily",
+      "description": "[daily] 搜索词级日报（ad_search_term_daily）。\n返回客户实际搜索词的曝光/点击/花费/sales_7d_total/orders_7d。\n通过 campaign_id 集合关联到 parent_asin。支持 min_clicks 阈值过滤。\n适用：S03 拓词、S05 否词候选。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "min_clicks": {
+            "type": "integer",
+            "description": "最小点击数过滤，默认 0"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "get_targeting_daily",
+      "description": "[daily] 投放词级日报（ad_targeting_daily）。\n返回投放关键词/ASIN 定向的 bid/曝光/点击/orders_7d。\n通过 campaign_id 集合关联 parent_asin。适用：F5、S03。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          },
+          "auto_summarize": {
+            "type": "boolean",
+            "description": "True 时按业务粒度聚合返回（CVR/ACOS/CPA），避免大窗口爆上下文。默认 False。"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "get_placement_daily",
+      "description": "[daily] 广告位日报（ad_placement_daily）。\n拆分搜索顶部/搜索其余/产品页/Off Amazon 四个 placement。\n通过 campaign_id 集合关联 parent_asin。适用：S01 PP 搜索倍数。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          },
+          "auto_summarize": {
+            "type": "boolean",
+            "description": "True 时按业务粒度聚合返回（CVR/ACOS/CPA），避免大窗口爆上下文。默认 False。"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "get_purchased_items",
+      "description": "[daily] 广告光环效应日报（ad_purchased_item_daily）。\n记录点击 parent_asin 的广告后用户实际购买的其他 ASIN。\n注：底表回流较慢，最新一般滞后 5-7 天。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          },
+          "auto_summarize": {
+            "type": "boolean",
+            "description": "True 时按业务粒度聚合返回（CVR/ACOS/CPA），避免大窗口爆上下文。默认 False。"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "get_review_summary",
+      "description": "[events] 评论事件流摘要（reviews，按 review_date）。\n返回星级分布 + 差评原文（rating ≤ 3，最多 20 条）。\n适用：U1 评论分析。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          }
+        },
+        "required": [
+          "parent_asin"
+        ]
+      }
+    },
+    {
+      "name": "get_inventory_snapshot",
+      "description": "[snapshot] FBA 库存快照（fba_inventory_snapshot，按 snapshot_date）。\n返回可用/预留/在途/可售天数/库龄分桶/健康状态。\n适用：GT-01 三角反推、补货决策。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "date": {
+            "type": "string",
+            "description": "快照日期 yyyy-MM-dd，缺省取最新"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          }
+        },
+        "required": [
+          "parent_asin"
+        ]
+      }
+    },
+    {
+      "name": "get_variant_snapshot",
+      "description": "[meta] 父 ASIN 下子变体清单 + 各自最新数据。\n合并 product_registry + product_analysis_window（最新行）+ fba_inventory_snapshot。\n适用：S06 多变体分析。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "date": {
+            "type": "string",
+            "description": "锚定日期 yyyy-MM-dd，缺省最新"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          }
+        },
+        "required": [
+          "parent_asin"
+        ]
+      }
+    },
+    {
+      "name": "get_negative_candidates",
+      "description": "[derived] 否词候选（基于 ad_search_term_daily 聚合）。\n规则：在 [start,end] 区间累计点击 ≥ click_threshold 且 orders_7d = 0。\n通过 parent_asin 关联的 campaign_id 限定范围。\n适用：S05 10-click 无单否词。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "click_threshold": {
+            "type": "integer",
+            "description": "点击阈值，默认 10"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "list_tables",
+      "description": "[meta] 列出 DB 所有表：表名 / 行数 / 类别后缀（daily/window/snapshot/events/meta）/ 最新日期。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "describe_table",
+      "description": "[meta] 查指定表的字段结构：字段名 / 类型 / NULL 率 / 取值样本。\n结合表名后缀即可判断 daily/window/snapshot/events 哪一类。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "table": {
+            "type": "string",
+            "description": "表名"
+          }
+        },
+        "required": [
+          "table"
+        ]
+      }
+    },
+    {
+      "name": "get_data_catalog",
+      "description": "[meta] 一次性返回完整数据目录：所有表 + 字段 + 店铺列表 + ETL 最近日志。\n适用：会话冷启动加载。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "get_product_daily",
+      "description": "[DEPRECATED] 改用 get_product_window（语义相同，命名更准确）。\n底表已重命名为 product_analysis_window（旧名保留为兼容 view）。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "get_product_profit",
+      "description": "[DEPRECATED] 改用 get_product_profit_window（语义相同，命名更准确）。\n底表已重命名为 sales_profit_window（旧名保留为兼容 view）。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "parent_asin": {
+            "type": "string",
+            "description": "父体 ASIN"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始日期 yyyy-MM-dd"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束日期 yyyy-MM-dd"
+          },
+          "shop_id": {
+            "type": "string",
+            "description": "店铺 ID，默认 298137（CACLSF）"
+          }
+        },
+        "required": [
+          "parent_asin",
+          "start_date",
+          "end_date"
+        ]
+      }
+    },
+    {
+      "name": "run_sql",
+      "description": "[只读聚合·推荐] 对分析库跑只读 SQL，让 GROUP BY/SUM/COUNT 在 SQLite 算完只回结论行，\n避免按表工具拉明细撞输出上限。仅允许单条 SELECT/WITH，无 LIMIT 自动补。\n先用 get_data_catalog/describe_table 了解表结构。\n例：SELECT search_term, SUM(spend) s FROM ad_search_term_daily WHERE shop_id='322449' GROUP BY search_term ORDER BY s DESC LIMIT 20",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sql": {
+            "type": "string",
+            "description": "单条只读 SELECT/WITH 查询"
+          },
+          "max_rows": {
+            "type": "integer",
+            "description": "无 LIMIT 时自动追加，默认 500"
+          }
+        },
+        "required": [
+          "sql"
+        ]
+      }
+    }
+  ],
+  "warnings": [],
+  "durationMs": 228,
+  "fetchedAt": "2026-08-10T11:56:30.671Z",
+  "attempts": [
+    {
+      "transport": "sse",
+      "url": "https://mcp.gab.sale/sse",
+      "status": "success",
+      "durationMs": 228
+    }
+  ]
+}

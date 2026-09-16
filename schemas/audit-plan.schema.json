@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "arguments",
+    "expected_success_markers",
+    "test_intent",
+    "success_criteria",
+    "safety_assessment",
+    "safety_controls",
+    "requires_manual_approval"
+  ],
+  "properties": {
+    "arguments": { "type": "object" },
+    "expected_success_markers": { "type": "array", "items": { "type": "string" } },
+    "test_intent": { "type": "string", "minLength": 1 },
+    "success_criteria": { "type": "string", "minLength": 1 },
+    "safety_assessment": { "type": "string", "minLength": 1 },
+    "safety_controls": { "type": "array", "items": { "type": "string" } },
+    "requires_manual_approval": { "const": true }
+  },
+  "additionalProperties": false
+}
