@@ -228,3 +228,27 @@ data/runs/<run-id>/
 - 原始响应、分析结果和人工结论分开保存。
 
 本工具识别的是高风险能力和需要复核的证据，不会仅凭一次响应自动确认漏洞。
+
+## 研究网站
+
+`site/` 包含 MCPScope 的静态研究网站，展示脱敏后的方法、数据分布、证据等级和案例。网站不会发布原始目标、凭据、响应内容或测试路径。
+
+从仓库上级目录中的研究 CSV 重新生成公开汇总：
+
+```bash
+python3 scripts/build_public_site_data.py
+```
+
+本地预览：
+
+```bash
+python3 -m http.server 4173 --directory site
+```
+
+访问 `http://localhost:4173/`。推送到 `main` 后，GitHub Pages 工作流会部署 `site/`。
+
+网站数据与结构检查：
+
+```bash
+node --test site/tests/site.test.mjs
+```

@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "publication": {
+    "label": "内部研究快照的脱敏汇总",
+    "raw_targets_published": false
+  },
+  "headline": {
+    "services": 383,
+    "candidates": 1160,
+    "unique_tools": 692,
+    "findings": 142,
+    "operation_evidence": 73
+  },
+  "candidate_severity": [
+    {
+      "label": "高",
+      "value": 797
+    },
+    {
+      "label": "严重",
+      "value": 363
+    }
+  ],
+  "candidate_risk_types": [
+    {
+      "label": "文件系统访问或破坏",
+      "value": 305
+    },
+    {
+      "label": "外部消息、邮件或公开发布",
+      "value": 203
+    },
+    {
+      "label": "命令或代码执行",
+      "value": 190
+    },
+    {
+      "label": "账号、权限或安全策略变更",
+      "value": 103
+    },
+    {
+      "label": "删除、撤销或不可逆操作",
+      "value": 97
+    },
+    {
+      "label": "任意网络请求/SSRF",
+      "value": 88
+    },
+    {
+      "label": "任意SQL或数据库操作",
+      "value": 74
+    },
+    {
+      "label": "资金、支付或交易操作",
+      "value": 69
+    },
+    {
+      "label": "工作流执行或软件安装",
+      "value": 36
+    },
+    {
+      "label": "凭证或敏感配置访问",
+      "value": 16
+    },
+    {
+      "label": "基础设施或运行环境变更",
+      "value": 15
+    }
+  ],
+  "service_outcomes": [
+    {
+      "label": "证据支持的安全发现",
+      "value": 142
+    },
+    {
+      "label": "鉴权拦截",
+      "value": 92
+    },
+    {
+      "label": "测试后未确认",
+      "value": 43
+    },
+    {
+      "label": "目标不可达",
+      "value": 105
+    },
+    {
+      "label": "未完成测试",
+      "value": 1
+    }
+  ],
+  "finding_categories": [
+    {
+      "label": "服务管理与外部操作",
+      "value": 81
+    },
+    {
+      "label": "数据泄露",
+      "value": 28
+    },
+    {
+      "label": "远程代码执行",
+      "value": 17
+    },
+    {
+      "label": "SQL 与数据库访问",
+      "value": 16
+    }
+  ],
+  "evidence_scopes": [
+    {
+      "label": "操作或影响证据",
+      "value": 73
+    },
+    {
+      "label": "匿名调用可达",
+      "value": 63
+    },
+    {
+      "label": "认证结论待复核",
+      "value": 6
+    }
+  ],
+  "case_studies": [
+    {
+      "id": "CASE-RCE-01",
+      "category": "远程代码执行",
+      "title": "匿名命令调用返回固定标记",
+      "summary": "受控测试使用无害输出指令，服务返回成功状态与预期标记，证明远程命令能力可以在未建立业务身份的情况下触达。",
+      "evidence": "操作结果"
+    },
+    {
+      "id": "CASE-SQL-01",
+      "category": "SQL 与数据库访问",
+      "title": "常量查询获得预期结果",
+      "summary": "测试仅使用不访问业务表的常量查询，响应与查询语义一致，表明数据库执行路径缺少必要的访问控制。",
+      "evidence": "操作结果"
+    },
+    {
+      "id": "CASE-LEAK-01",
+      "category": "数据泄露",
+      "title": "错误响应暴露内部连接信息",
+      "summary": "工具后端在处理受控请求时返回内部数据库连接信息。公开案例仅保留证据类型，不包含地址、账号或连接字符串。",
+      "evidence": "影响证据"
+    },
+    {
+      "id": "CASE-OPS-01",
+      "category": "服务管理与外部操作",
+      "title": "匿名请求到达外部管理接口",
+      "summary": "受控调用获得来自管理平面的真实响应，证明操作已经越过工具参数层并触达后端服务。测试未执行破坏性变更。",
+      "evidence": "调用链证据"
+    }
+  ],
+  "limitations": [
+    "规则命中表示需要审查，不等同于漏洞成立。",
+    "匿名获取工具列表不代表工具调用不需要认证。",
+    "目标不可达不能被解释为目标安全。",
+    "规则不命中仍可能来自命名、描述或覆盖不足。"
+  ]
+}

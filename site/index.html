@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MCPScope 是面向 MCP 服务的资产发现、风险识别与受控安全验证平台。">
+  <meta name="theme-color" content="#10231d">
+  <meta property="og:title" content="MCPScope">
+  <meta property="og:description" content="MCP 资产发现、风险识别与受控安全验证平台">
+  <meta property="og:type" content="website">
+  <title>MCPScope | MCP 安全研究</title>
+  <link rel="stylesheet" href="css/site.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" data-header>
+    <div class="header-inner">
+      <a class="brand" href="#overview" aria-label="MCPScope 首页">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>MCPScope</span>
+      </a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-navigation" data-menu-button>
+        <span class="menu-icon" aria-hidden="true">☰</span>
+        <span class="sr-only">打开导航</span>
+      </button>
+      <nav class="primary-navigation" id="primary-navigation" aria-label="主要导航" data-navigation>
+        <a href="#problem">问题</a>
+        <a href="#method">方法</a>
+        <a href="#dataset">数据</a>
+        <a href="#findings">发现</a>
+        <a href="#cases">案例</a>
+        <a href="#boundaries">边界</a>
+        <a class="nav-repository" href="https://github.com/KbLoser/MCPScope" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="overview" aria-labelledby="hero-title">
+      <canvas class="network-canvas" id="network-canvas" aria-hidden="true"></canvas>
+      <div class="hero-overlay" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <p class="eyebrow">EVIDENCE-LED MCP SECURITY RESEARCH</p>
+        <h1 id="hero-title">MCPScope</h1>
+        <p class="hero-subtitle">MCP 资产发现、风险识别与受控安全验证平台</p>
+        <p class="hero-summary">从公开资产线索到协议指纹、工具能力分析和人工授权验证，将高风险能力转化为可审查、可复现、可分级的安全证据。</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#findings">查看研究结果 <span aria-hidden="true">↓</span></a>
+          <a class="button button-quiet" href="https://github.com/KbLoser/MCPScope" target="_blank" rel="noreferrer">查看源码 <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+
+      <div class="hero-metrics" aria-label="研究概览">
+        <div class="hero-metric">
+          <strong data-metric="services">383</strong>
+          <span>高风险服务</span>
+        </div>
+        <div class="hero-metric">
+          <strong data-metric="candidates">1,160</strong>
+          <span>工具候选</span>
+        </div>
+        <div class="hero-metric">
+          <strong data-metric="findings">142</strong>
+          <span>证据支持的发现</span>
+        </div>
+        <div class="hero-metric hero-metric-emphasis">
+          <strong data-metric="operation_evidence">73</strong>
+          <span>操作或影响证据</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section problem-section" id="problem" aria-labelledby="problem-title">
+      <div class="section-inner">
+        <div class="section-heading heading-grid">
+          <div>
+            <p class="section-index">01 / 问题</p>
+            <h2 id="problem-title">工具接口扩大了服务的安全边界</h2>
+          </div>
+          <p>MCP 将数据库、文件系统、命令执行、消息发送和基础设施能力暴露为统一工具。风险不只取决于工具名称，更取决于匿名访问、参数边界、后端权限和实际副作用。</p>
+        </div>
+
+        <div class="risk-path" aria-label="风险形成路径">
+          <div class="risk-path-step">
+            <span>01</span>
+            <strong>服务可发现</strong>
+            <p>公开索引与部署指纹暴露候选入口。</p>
+          </div>
+          <div class="risk-path-connector" aria-hidden="true">→</div>
+          <div class="risk-path-step">
+            <span>02</span>
+            <strong>能力可枚举</strong>
+            <p>工具名称、描述和 Schema 揭示高权限能力。</p>
+          </div>
+          <div class="risk-path-connector" aria-hidden="true">→</div>
+          <div class="risk-path-step">
+            <span>03</span>
+            <strong>调用可触达</strong>
+            <p>匿名请求越过协议层并进入后端逻辑。</p>
+          </div>
+          <div class="risk-path-connector" aria-hidden="true">→</div>
+          <div class="risk-path-step risk-path-step-alert">
+            <span>04</span>
+            <strong>影响可验证</strong>
+            <p>受控测试获得操作结果或影响证据。</p>
+          </div>
+        </div>
+
+        <div class="observation-grid">
+          <article>
+            <span class="observation-number">A</span>
+            <h3>发现不等于扫描</h3>
+            <p>公开索引阶段只生成候选，不主动连接未知服务。</p>
+          </article>
+          <article>
+            <span class="observation-number">B</span>
+            <h3>候选不等于漏洞</h3>
+            <p>关键词规则用于缩小审查范围，最终结论由证据等级决定。</p>
+          </article>
+          <article>
+            <span class="observation-number">C</span>
+            <h3>验证不等于利用</h3>
+            <p>测试使用无害参数、虚构标识和单次人工批准调用。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section method-section" id="method" aria-labelledby="method-title">
+      <div class="section-inner">
+        <div class="section-heading heading-grid heading-grid-dark">
+          <div>
+            <p class="section-index">02 / 方法</p>
+            <h2 id="method-title">从互联网线索到可复核证据</h2>
+          </div>
+          <p>流程将被动发现、主动指纹和工具调用拆成独立授权边界。每一步都保留原始证据，同时限制测试规模和副作用。</p>
+        </div>
+
+        <ol class="method-timeline">
+          <li>
+            <span class="method-number">01</span>
+            <div><strong>被动发现</strong><p>从公开来源收集候选，不连接候选服务。</p></div>
+            <code>targets-discover</code>
+          </li>
+          <li>
+            <span class="method-number">02</span>
+            <div><strong>协议指纹</strong><p>在授权范围内识别端点、传输、工具和认证状态。</p></div>
+            <code>targets-scan</code>
+          </li>
+          <li>
+            <span class="method-number">03</span>
+            <div><strong>风险筛选</strong><p>分析名称、描述和输入 Schema，聚合能力风险。</p></div>
+            <code>audit</code>
+          </li>
+          <li>
+            <span class="method-number">04</span>
+            <div><strong>受控验证</strong><p>确定性校验通过后，只执行一次人工批准调用。</p></div>
+            <code>execute</code>
+          </li>
+          <li>
+            <span class="method-number">05</span>
+            <div><strong>人工复核</strong><p>区分操作证据、调用可达和需要复核的冲突。</p></div>
+            <code>review</code>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section dataset-section" id="dataset" aria-labelledby="dataset-title">
+      <div class="section-inner">
+        <div class="section-heading heading-grid">
+          <div>
+            <p class="section-index">03 / 数据集</p>
+            <h2 id="dataset-title">383 个服务的风险审查快照</h2>
+          </div>
+          <p>公开页面仅使用脱敏聚合数据。原始地址、连接信息、响应内容、测试路径和可直接复现的载荷不会进入网站。</p>
+        </div>
+
+        <div class="dataset-strip">
+          <div><span>不同工具名称</span><strong data-metric="unique_tools">692</strong></div>
+          <div><span>平均候选 / 服务</span><strong>3.03</strong></div>
+          <div><span>严重风险候选</span><strong data-severity="严重">363</strong></div>
+          <div><span>高风险候选</span><strong data-severity="高">797</strong></div>
+        </div>
+
+        <div class="chart-grid chart-grid-wide">
+          <figure class="chart-figure">
+            <div class="figure-heading">
+              <div><span>服务结果</span><h3>授权测试后的服务状态</h3></div>
+              <span class="figure-unit">服务数</span>
+            </div>
+            <canvas id="service-outcomes-chart" class="data-chart" role="img" aria-label="授权测试后的服务状态柱状图"></canvas>
+            <div class="chart-legend" id="service-outcomes-legend"></div>
+            <figcaption>每个服务只计入一个最终状态，避免多个候选工具重复计算。</figcaption>
+          </figure>
+
+          <figure class="chart-figure">
+            <div class="figure-heading">
+              <div><span>能力覆盖</span><h3>高风险工具候选类型</h3></div>
+              <span class="figure-unit">候选数</span>
+            </div>
+            <canvas id="risk-types-chart" class="data-chart chart-tall" role="img" aria-label="高风险工具候选类型横向柱状图"></canvas>
+            <figcaption>一项工具可能同时命中多个风险类型，因此分类计数之和可能高于候选总数。</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section findings-section" id="findings" aria-labelledby="findings-title">
+      <div class="section-inner">
+        <div class="section-heading heading-grid">
+          <div>
+            <p class="section-index">04 / 发现</p>
+            <h2 id="findings-title">142 个发现，三种证据强度</h2>
+          </div>
+          <p>研究结论不把“可以调用”和“已经造成影响”混为一谈。证据等级决定对外措辞，也决定后续复核优先级。</p>
+        </div>
+
+        <div class="evidence-grid" id="evidence-grid" aria-label="证据等级">
+          <article class="evidence-level evidence-level-strong">
+            <div><span>LEVEL A</span><strong data-evidence="操作或影响证据">73</strong></div>
+            <h3>操作或影响证据</h3>
+            <p>获得与受控测试意图一致的结果，或确认敏感信息、后端操作等实际影响。</p>
+            <div class="evidence-meter"><span style="width:51.4%"></span></div>
+          </article>
+          <article class="evidence-level evidence-level-reach">
+            <div><span>LEVEL B</span><strong data-evidence="匿名调用可达">63</strong></div>
+            <h3>匿名调用可达</h3>
+            <p>请求已进入工具后端或业务校验，但尚未证明最终状态改变或敏感数据返回。</p>
+            <div class="evidence-meter"><span style="width:44.4%"></span></div>
+          </article>
+          <article class="evidence-level evidence-level-review">
+            <div><span>REVIEW</span><strong data-evidence="认证结论待复核">6</strong></div>
+            <h3>认证结论待复核</h3>
+            <p>人工结果显示认证要求，与自动标记存在冲突，不纳入已验证影响结论。</p>
+            <div class="evidence-meter"><span style="width:4.2%"></span></div>
+          </article>
+        </div>
+
+        <div class="chart-grid findings-chart-grid">
+          <figure class="chart-figure category-figure">
+            <div class="figure-heading">
+              <div><span>最终分类</span><h3>证据支持的发现类别</h3></div>
+              <span class="figure-unit">发现数</span>
+            </div>
+            <canvas id="finding-categories-chart" class="data-chart" role="img" aria-label="证据支持的发现类别环形图"></canvas>
+            <div class="chart-legend category-legend" id="finding-categories-legend"></div>
+          </figure>
+          <div class="finding-statement">
+            <p class="statement-label">KEY OBSERVATION</p>
+            <p class="statement-text">服务管理与外部操作占最终分类的 <strong>57%</strong>，说明风险不仅来自命令执行和数据库访问，也来自看似普通但能够改变外部状态的业务工具。</p>
+            <div class="statement-rule"></div>
+            <p class="statement-note">因此，能力聚类和副作用识别与传统关键词同样重要。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cases-section" id="cases" aria-labelledby="cases-title">
+      <div class="section-inner">
+        <div class="section-heading heading-grid">
+          <div>
+            <p class="section-index">05 / 脱敏案例</p>
+            <h2 id="cases-title">保留结论，移除可利用细节</h2>
+          </div>
+          <p>案例只展示验证逻辑、证据类型和安全意义，不公开目标、凭据、请求标识、原始响应或可直接复现的参数。</p>
+        </div>
+        <div class="case-grid" id="case-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section boundaries-section" id="boundaries" aria-labelledby="boundaries-title">
+      <div class="section-inner">
+        <div class="section-heading heading-grid heading-grid-dark">
+          <div>
+            <p class="section-index">06 / 局限与安全边界</p>
+            <h2 id="boundaries-title">研究结论必须保留边界</h2>
+          </div>
+          <p>MCPScope 优先减少未经授权的主动行为，并明确区分未知、不可达、被鉴权拦截、调用可达和影响已验证。</p>
+        </div>
+
+        <div class="boundaries-grid">
+          <div>
+            <h3>方法局限</h3>
+            <ul class="boundary-list" id="limitations-list"></ul>
+          </div>
+          <div>
+            <h3>执行约束</h3>
+            <ul class="boundary-list">
+              <li><span>01</span><p>主动指纹和工具调用必须处于明确授权范围。</p></li>
+              <li><span>02</span><p>默认只读取元数据，不执行任何 MCP 工具。</p></li>
+              <li><span>03</span><p>调用前执行确定性参数校验和人工批准。</p></li>
+              <li><span>04</span><p>每次最多调用一个候选，并保留审批摘要。</p></li>
+              <li><span>05</span><p>公开材料经过独立脱敏构建和泄露检查。</p></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section project-section" aria-labelledby="project-title">
+      <div class="section-inner project-inner">
+        <p class="section-index">OPEN RESEARCH TOOLING</p>
+        <h2 id="project-title">复现方法，而不是暴露目标</h2>
+        <p>代码仓库包含资产发现、协议探测、风险分析、证据管理、报告导出和受控验证流程。公开网站只发布脱敏后的研究统计。</p>
+        <div class="project-actions">
+          <a class="button button-dark" href="https://github.com/KbLoser/MCPScope" target="_blank" rel="noreferrer">访问 GitHub <span aria-hidden="true">↗</span></a>
+          <a class="text-link" href="https://github.com/KbLoser/MCPScope#readme" target="_blank" rel="noreferrer">阅读使用文档 <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div><strong>MCPScope</strong><span>MCP security research toolkit</span></div>
+      <p><span data-publication-label>脱敏研究汇总</span> · 不公开原始目标与响应</p>
+      <a href="#overview" aria-label="返回页面顶部">↑</a>
+    </div>
+  </footer>
+
+  <noscript>
+    <div class="noscript-message">此页面需要 JavaScript 来加载脱敏统计图表。</div>
+  </noscript>
+</body>
+</html>
