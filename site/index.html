@@ -82,47 +82,26 @@
           <p>MCP 将数据库、文件系统、命令执行、消息发送和基础设施能力暴露为统一工具。风险不只取决于工具名称，更取决于匿名访问、参数边界、后端权限和实际副作用。</p>
         </div>
 
-        <div class="risk-path" aria-label="风险形成路径">
-          <div class="risk-path-step">
-            <span>01</span>
-            <strong>服务可发现</strong>
-            <p>公开索引与部署指纹暴露候选入口。</p>
-          </div>
-          <div class="risk-path-connector" aria-hidden="true">→</div>
-          <div class="risk-path-step">
-            <span>02</span>
-            <strong>能力可枚举</strong>
-            <p>工具名称、描述和 Schema 揭示高权限能力。</p>
-          </div>
-          <div class="risk-path-connector" aria-hidden="true">→</div>
-          <div class="risk-path-step">
-            <span>03</span>
-            <strong>调用可触达</strong>
-            <p>匿名请求越过协议层并进入后端逻辑。</p>
-          </div>
-          <div class="risk-path-connector" aria-hidden="true">→</div>
-          <div class="risk-path-step risk-path-step-alert">
-            <span>04</span>
-            <strong>影响可验证</strong>
-            <p>受控测试获得操作结果或影响证据。</p>
-          </div>
-        </div>
-
-        <div class="observation-grid">
+        <div class="problem-grid" aria-label="MCP 工具风险成因">
           <article>
-            <span class="observation-number">A</span>
-            <h3>发现不等于扫描</h3>
-            <p>公开索引阶段只生成候选，不主动连接未知服务。</p>
+            <span class="problem-kicker">ABSTRACTION</span>
+            <h3>真实权限被工具接口遮蔽</h3>
+            <p>统一的调用形式弱化了对底层数据库、文件系统和运行环境权限的感知。</p>
           </article>
           <article>
-            <span class="observation-number">B</span>
-            <h3>候选不等于漏洞</h3>
-            <p>关键词规则用于缩小审查范围，最终结论由证据等级决定。</p>
+            <span class="problem-kicker">METADATA</span>
+            <h3>元数据已经暴露能力边界</h3>
+            <p>工具名称、描述和输入 Schema 可以揭示命令执行、数据访问与外部操作能力。</p>
           </article>
           <article>
-            <span class="observation-number">C</span>
-            <h3>验证不等于利用</h3>
-            <p>测试使用无害参数、虚构标识和单次人工批准调用。</p>
+            <span class="problem-kicker">AUTHORIZATION</span>
+            <h3>身份检查与后端调用可能脱节</h3>
+            <p>服务可以公开枚举工具，也可能在参数校验后才暴露真实的认证与授权状态。</p>
+          </article>
+          <article>
+            <span class="problem-kicker">SIDE EFFECTS</span>
+            <h3>业务型工具也会改变外部状态</h3>
+            <p>发送消息、管理服务或触发工作流看似常规，但同样可以产生真实且难以撤销的影响。</p>
           </article>
         </div>
       </div>
@@ -165,6 +144,30 @@
             <code>review</code>
           </li>
         </ol>
+
+        <div class="method-principles">
+          <div class="principles-heading">
+            <span>判定原则</span>
+            <p>方法要同时限定发现、候选和验证的含义，避免把线索直接当作漏洞结论。</p>
+          </div>
+          <div class="principle-grid">
+            <article>
+              <span>A</span>
+              <h3>发现不等于扫描</h3>
+              <p>公开索引阶段只生成候选，不主动连接未知服务。</p>
+            </article>
+            <article>
+              <span>B</span>
+              <h3>候选不等于漏洞</h3>
+              <p>关键词规则用于缩小审查范围，最终结论由证据等级决定。</p>
+            </article>
+            <article>
+              <span>C</span>
+              <h3>验证不等于利用</h3>
+              <p>测试使用无害参数、虚构标识和单次人工批准调用。</p>
+            </article>
+          </div>
+        </div>
       </div>
     </section>
 

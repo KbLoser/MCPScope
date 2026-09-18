@@ -1,6 +1,14 @@
 const DATA_URL = "data/public-summary.json";
 const COLORS = ["#bd4a40", "#2f7f78", "#397799", "#c58c28", "#688078", "#855f84"];
 
+if (!window.location.hash) {
+  history.scrollRestoration = "manual";
+  window.scrollTo(0, 0);
+  window.addEventListener("pageshow", () => {
+    if (!window.location.hash) window.scrollTo(0, 0);
+  }, { once: true });
+}
+
 const state = {
   data: null,
   chartRenderers: [],

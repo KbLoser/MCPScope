@@ -16,6 +16,21 @@ test("research site contains the required narrative sections", async () => {
   assert.match(html, /<h1[^>]*>MCPScope<\/h1>/);
   assert.match(html, /network-canvas/);
   assert.match(html, /public-summary\.json|data-metric/);
+
+  const problem = html.slice(html.indexOf('id="problem"'), html.indexOf('id="method"'));
+  const method = html.slice(html.indexOf('id="method"'), html.indexOf('id="dataset"'));
+  assert.match(problem, /真实权限被工具接口遮蔽/);
+  assert.doesNotMatch(problem, /发现不等于扫描|候选不等于漏洞|验证不等于利用/);
+  assert.match(method, /判定原则/);
+  assert.match(method, /发现不等于扫描|候选不等于漏洞|验证不等于利用/);
+});
+
+
+test("navigation only restores the top position for a URL without an anchor", async () => {
+  const javascript = await readFile(path.join(siteRoot, "js", "main.js"), "utf8");
+  assert.match(javascript, /if \(!window\.location\.hash\)/);
+  assert.match(javascript, /history\.scrollRestoration = "manual"/);
+  assert.match(javascript, /pageshow/);
 });
 
 
