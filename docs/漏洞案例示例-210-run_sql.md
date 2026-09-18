@@ -27,7 +27,7 @@
 
 先确认 MCP 服务和 run_sql 工具是否仍然存在：
 
-    ./run.sh discover --url https://mcp.gab.sale/sse --transport sse --output data/run_sql-discovery.json
+    ./mcpscope discover --url https://mcp.gab.sale/sse --transport sse --output data/run_sql-discovery.json
 
 该命令只执行 MCP 初始化和 tools/list，不会调用 run_sql。
 
@@ -41,7 +41,7 @@
 
 仅对已经授权的目标运行 audit：
 
-    ./run.sh audit --url https://mcp.gab.sale/sse --transport sse --plan-top 5
+    ./mcpscope audit --url https://mcp.gab.sale/sse --transport sse --plan-top 5
 
 命令会输出运行目录，例如：
 
@@ -58,7 +58,7 @@
 
 确认目标、工具、参数和授权范围后，再执行：
 
-    ./run.sh execute --run-dir data/runs/20260810-190000-ab12cd34 --candidate-id 1 --transport sse --approve --authorization-ack I_HAVE_AUTHORIZATION
+    ./mcpscope execute --run-dir data/runs/20260810-190000-ab12cd34 --candidate-id 1 --transport sse --approve --authorization-ack I_HAVE_AUTHORIZATION
 
 计划必须是只读常量查询，例如：
 
@@ -83,7 +83,7 @@
 
 例如当前只确认调用可达、还需要补充业务证据：
 
-    ./run.sh review --run-dir data/runs/20260810-190000-ab12cd34 --candidate-id 1 --decision needs_more_evidence --notes "常量 SQL 返回成功；需服务所有者确认匿名权限边界和数据库范围"
+    ./mcpscope review --run-dir data/runs/20260810-190000-ab12cd34 --candidate-id 1 --decision needs_more_evidence --notes "常量 SQL 返回成功；需服务所有者确认匿名权限边界和数据库范围"
 
 可选结论为 confirmed、not_confirmed 和 needs_more_evidence。
 
@@ -100,6 +100,6 @@
 
 本地测试不会连接上述历史公网目标。
 
- ./run.sh one-click \
+ ./mcpscope one-click \
     --url https://mcp.gab.sale/sse \
     --plan-top 5

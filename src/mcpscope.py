@@ -26,8 +26,9 @@ from integration_exports import condor_targets, corvus_yaml, emit_events, ibis_c
 
 APP_ROOT = Path(__file__).resolve().parents[1]
 NODE_ROOT = APP_ROOT / "node"
-DEFAULT_DATA_ROOT = Path(os.getenv("MCP_AUDIT_DATA_DIR", str(APP_ROOT / "data"))).resolve()
+DEFAULT_DATA_ROOT = Path(os.getenv("MCPSCOPE_DATA_DIR", str(APP_ROOT / "data"))).resolve()
 AUTH_ACK = "I_HAVE_AUTHORIZATION"
+VERSION = "1.0.0"
 
 
 def bounded_integer(value: str, minimum: int, maximum: int, option: str) -> int:
@@ -680,7 +681,11 @@ def command_review(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="mcp-audit", description="Authorized, evidence-oriented MCP security audit toolkit.")
+    parser = argparse.ArgumentParser(
+        prog="mcpscope",
+        description="Discover, fingerprint, and safely validate authorized MCP services.",
+    )
+    parser.add_argument("--version", action="version", version=f"MCPScope {VERSION}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     discover_parser = subparsers.add_parser("discover", help="Read-only MCP initialize and tools/list")

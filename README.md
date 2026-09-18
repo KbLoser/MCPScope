@@ -1,6 +1,8 @@
-# MCP Audit One-Click
+# MCPScope
 
-一个本地优先、证据导向的 MCP 目标发现与安全审计工具包。
+MCP 资产发现、风险识别与受控安全验证平台。
+
+MCPScope 是一个本地优先、证据导向的 MCP 安全工具，覆盖公开资产发现、协议指纹、能力风险分析、审计历史和经人工批准的受控验证。
 
 工具把流程拆分为两个安全边界：公开索引查询只生成候选地址，不连接候选 MCP；主动指纹扫描必须确认目标处于书面授权范围。后续审计默认只读取 MCP 元数据、筛选高风险候选并生成测试计划，只有再次显式批准后才执行一次 `tools/call`。
 
@@ -10,14 +12,14 @@
 - Python 3.11+
 - Node.js 20+ 与 npm
 
-不需要 Docker。首次运行 `run.sh` 会自动创建 `.venv`、安装 Python 依赖，并在缺少 Node 依赖时执行 `npm ci`。
+不需要 Docker。首次运行 `mcpscope` 会自动创建 `.venv`、安装 Python 依赖，并在缺少 Node 依赖时执行 `npm ci`。
 
 ## 快速开始
 
 ```bash
 cp .env.example .env
-chmod +x run.sh
-./run.sh --help
+./mcpscope --help
+./mcpscope --version
 ```
 
 ## 完整流程
@@ -39,7 +41,7 @@ MCP 指纹、工具清单和风险排序
 默认查询 crt.sh、HuggingFace、GitHub、npm、PyPI、Smithery、Glama、PulseMCP、Censys、FOFA 和 Shodan。需要凭据的来源在未配置时会给出警告并跳过：
 
 ```bash
-./run.sh targets-discover \
+./mcpscope targets-discover \
   --limit-per-source 100 \
   --output data/targets/candidates.json
 ```
@@ -47,7 +49,7 @@ MCP 指纹、工具清单和风险排序
 也可以只选择部分来源：
 
 ```bash
-./run.sh targets-discover \
+./mcpscope targets-discover \
   --source huggingface \
   --source github \
   --output data/targets/candidates.json
@@ -60,7 +62,7 @@ MCP 指纹、工具清单和风险排序
 主动扫描会执行 MCP 初始化和 `tools/list`，因此必须先人工核对候选清单，只保留书面授权范围内的地址：
 
 ```bash
-./run.sh targets-scan \
+./mcpscope targets-scan \
   --input data/targets/authorized-targets.json \
   --max-targets 25 \
   --concurrency 4 \
@@ -80,7 +82,7 @@ MCP 指纹、工具清单和风险排序
 生成离线 Markdown 汇总：
 
 ```bash
-./run.sh targets-report \
+./mcpscope targets-report \
   --input data/targets/fingerprint-results.json \
   --output data/targets/fingerprint-report.md
 ```
@@ -88,7 +90,7 @@ MCP 指纹、工具清单和风险排序
 比较两次指纹扫描，识别新增、消失、风险变化和工具变化：
 
 ```bash
-./run.sh targets-diff \
+./mcpscope targets-diff \
   --old data/targets/fingerprint-old.json \
   --new data/targets/fingerprint-new.json \
   --output data/targets/fingerprint-diff.json
@@ -97,29 +99,29 @@ MCP 指纹、工具清单和风险排序
 生成 SARIF、HTML、Markdown 和 CSV：
 
 ```bash
-./run.sh report --input data/targets/fingerprint-results.json \
+./mcpscope report --input data/targets/fingerprint-results.json \
   --format sarif --format html --format markdown --format csv
 ```
 
 查询历史、趋势和单目标纵向记录：
 
 ```bash
-./run.sh history
-./run.sh trend critical_count
-./run.sh longitudinal https://authorized.example/mcp
-./run.sh decay
+./mcpscope history
+./mcpscope trend critical_count
+./mcpscope longitudinal https://authorized.example/mcp
+./mcpscope decay
 ```
 
 持续复扫最近一次扫描中的严重执行类目标仍属于主动操作，因此需要授权确认：
 
 ```bash
-./run.sh watch --max-rounds 1 --authorization-ack I_HAVE_AUTHORIZATION
+./mcpscope watch --max-rounds 1 --authorization-ack I_HAVE_AUTHORIZATION
 ```
 
 ### 3. 为单个授权目标生成测试计划
 
 ```bash
-./run.sh audit \
+./mcpscope audit \
   --url https://authorized.example/mcp \
   --plan-top 5
 ```
@@ -127,7 +129,7 @@ MCP 指纹、工具清单和风险排序
 运行目录写入 `data/runs/<run-id>/`。不配置大模型时使用本地安全模板；使用兼容接口生成计划时增加 `--llm`：
 
 ```bash
-./run.sh audit \
+./mcpscope audit \
   --url https://authorized.example/mcp \
   --llm \
   --plan-top 5
@@ -138,7 +140,7 @@ MCP 指纹、工具清单和风险排序
 ### 4. 人工批准后执行一次调用
 
 ```bash
-./run.sh execute \
+./mcpscope execute \
   --run-dir data/runs/20260810-120000-ab12cd34 \
   --candidate-id 1 \
   --approve \
@@ -152,7 +154,7 @@ MCP 指纹、工具清单和风险排序
 如果希望从一个 URL 自动完成探测、风险筛选和测试计划生成，可以使用 `one-click`：
 
 ```bash
-./run.sh one-click \
+./mcpscope one-click \
   --url https://authorized.example/mcp \
   --plan-top 5
 ```
@@ -160,7 +162,7 @@ MCP 指纹、工具清单和风险排序
 默认流程会在生成计划后停止，并输出运行目录。确认计划和授权范围后，可以显式允许执行一个候选的一次调用：
 
 ```bash
-./run.sh one-click \
+./mcpscope one-click \
   --url https://authorized.example/mcp \
   --plan-top 5 \
   --execute \
@@ -174,7 +176,7 @@ MCP 指纹、工具清单和风险排序
 ### 6. 记录人工结论
 
 ```bash
-./run.sh review \
+./mcpscope review \
   --run-dir data/runs/20260810-120000-ab12cd34 \
   --candidate-id 1 \
   --decision needs_more_evidence \
@@ -186,7 +188,7 @@ MCP 指纹、工具清单和风险排序
 只读取一个已知 MCP 的工具列表：
 
 ```bash
-./run.sh discover --url https://authorized.example/mcp
+./mcpscope discover --url https://authorized.example/mcp
 ```
 
 扫描结果还可以通过 `feed-corvus`、`feed-condor`、`feed-shrike` 和 `feed-ibis` 转换给下游系统。`feed-ibis` 默认只预览，实际提交同时要求 `--apply --approve`。向 CobaltoHQ 发出事件使用 `emit-cobalto --approve`，不会随扫描自动发送。

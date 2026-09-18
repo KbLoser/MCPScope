@@ -84,7 +84,7 @@ Hard requirements:
 - Never use discovered real IDs, credentials, personal data, production recipients, or payment details.
 - Commands may only print a fixed audit marker; do not invoke a shell, network client, interpreter, package manager, or filesystem command.
 - SQL may only return literal constants. Do not reference tables, views, schemas, functions, or system catalogs.
-- File operations may only use a dedicated /tmp/mcp-audit/ path and must not read existing files.
+- File operations may only use a dedicated /tmp/mcpscope/ path and must not read existing files.
 - URL tests may only use an explicitly supplied allowed callback URL. If none is supplied, use https://example.invalid/audit-safe-probe.
 - Destructive, financial, messaging, IAM, and infrastructure tools must use fake targets and may only prove that business validation was reached.
 - Set requires_manual_approval to true.

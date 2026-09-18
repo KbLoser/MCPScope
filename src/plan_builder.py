@@ -15,7 +15,7 @@ def _string_value(key: str, description: str, allowed_resources: List[str]) -> s
     if re.search(r"(?:phone|mobile|channel|username|handle)", context):
         return "audit-test-00000000"
     if re.search(r"(?:path|file|filename|directory|folder)", context):
-        return "/tmp/mcp-audit/audit-safe-probe.txt"
+        return "/tmp/mcpscope/audit-safe-probe.txt"
     if re.search(r"(?:id|uuid|slug|resource|project|workspace|account|user|tenant)", context):
         return "audit-test-00000000"
     return "audit-safe-probe"

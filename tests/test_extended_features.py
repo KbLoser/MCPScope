@@ -2,8 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from integration_exports import corvus_yaml, ibis_candidates
-from report_formats import write_reports
+from integration_exports import corvus_yaml, ibis_candidates, shrike_yaml
+from report_formats import to_sarif, write_reports
 from risk_rules import assess_server, classify_tool
 from scan_history import decay_stats, list_runs, persistence_counts, record_scan, target_history, trend
 from target_discovery import PublicIndexDiscovery
@@ -83,7 +83,11 @@ class HistoryAndOutputTest(unittest.TestCase):
             self.assertTrue(all(Path(path).exists() for path in outputs.values()))
 
         self.assertIn("targets:", corvus_yaml(document))
+        self.assertIn("source: mcpscope", shrike_yaml(document))
         self.assertEqual(ibis_candidates(document)[0]["package"], "demo.example")
+        sarif = to_sarif([record])
+        self.assertEqual(sarif["runs"][0]["tool"]["driver"]["name"], "MCPScope")
+        self.assertEqual(sarif["runs"][0]["results"][0]["ruleId"], "MCPSCOPE-严重")
 
 
 class ExtraDiscoverySourceTest(unittest.TestCase):

@@ -303,9 +303,9 @@ def validate_policy(
 
         if PATH_KEY_PATTERN.search(key) and isinstance(value, str):
             if ".." in value or not (
-                value.startswith("/tmp/mcp-audit/") or AUDIT_MARKER_PATTERN.search(value)
+                value.startswith("/tmp/mcpscope/") or AUDIT_MARKER_PATTERN.search(value)
             ):
-                report.errors.append(f"{path}: file paths must stay under /tmp/mcp-audit/ or use a test marker")
+                report.errors.append(f"{path}: file paths must stay under /tmp/mcpscope/ or use a test marker")
 
         if COMMAND_KEY_PATTERN.search(key) and isinstance(value, str) and "命令或代码执行" in categories:
             validate_command(path, value, report)

@@ -24,7 +24,7 @@ DEFAULT_SOURCES = (
     "shodan",
 )
 SOURCE_NAMES = frozenset(DEFAULT_SOURCES)
-USER_AGENT = "mcp-audit-target-discovery/1.0"
+USER_AGENT = "mcpscope-target-discovery/1.0"
 
 _SKIP_HOSTS = frozenset(
     {

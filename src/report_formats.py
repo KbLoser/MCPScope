@@ -18,7 +18,7 @@ def to_sarif(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     results = []
     for record in records:
         tier = str(record.get("risk_level", "信息"))
-        rule_id = f"MCP-AUDIT-{tier}"
+        rule_id = f"MCPSCOPE-{tier}"
         if rule_id not in seen:
             seen.add(rule_id)
             rules.append({"id": rule_id, "name": f"MCP{tier}Risk", "shortDescription": {"text": f"{tier}风险 MCP 服务"}, "defaultConfiguration": {"level": SARIF_LEVEL.get(tier, "none")}})
@@ -30,7 +30,7 @@ def to_sarif(records: List[Dict[str, Any]]) -> Dict[str, Any]:
             "locations": [{"physicalLocation": {"artifactLocation": {"uri": record.get("url", "")}}}],
             "properties": {"auth": record.get("auth_state"), "transport": record.get("transport"), "priority_score": record.get("priority_score", 0)},
         })
-    return {"$schema": "https://json.schemastore.org/sarif-2.1.0.json", "version": "2.1.0", "runs": [{"tool": {"driver": {"name": "mcp-audit-one-click", "rules": rules}}, "results": results}]}
+    return {"$schema": "https://json.schemastore.org/sarif-2.1.0.json", "version": "2.1.0", "runs": [{"tool": {"driver": {"name": "MCPScope", "rules": rules}}, "results": results}]}
 
 
 def to_csv(records: Iterable[Dict[str, Any]]) -> str:
@@ -43,7 +43,7 @@ def to_csv(records: Iterable[Dict[str, Any]]) -> str:
     return buffer.getvalue()
 
 
-def to_html(records: List[Dict[str, Any]], title: str = "MCP Audit Report") -> str:
+def to_html(records: List[Dict[str, Any]], title: str = "MCPScope Report") -> str:
     rows = []
     for record in records:
         reasons = "<br>".join(html.escape(str(item)) for item in record.get("risk_reasons", []))

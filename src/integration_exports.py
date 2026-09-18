@@ -63,7 +63,7 @@ def shrike_yaml(document: Dict[str, Any], minimum_score: int = 50, source: str =
             continue
         lines.extend([
             f"  - url: {json.dumps(record['url'])}",
-            "    source: mcp-one",
+            "    source: mcpscope",
             f"    priority_score: {priority}",
             f"    auth: {json.dumps(record.get('auth_state', 'unknown'))}",
             f"    tools_count: {int(record.get('tool_count', 0))}",
@@ -112,7 +112,7 @@ def emit_events(document: Dict[str, Any], output_file: str) -> int:
     emitted = 0
     for record in selected_records(document, "高"):
         try:
-            emit("mcp_audit.server.high_risk", {"url": record["url"], "risk_level": record.get("risk_level"), "priority_score": record.get("priority_score"), "output_file": output_file}, "mcp-audit-one-click")
+            emit("mcpscope.server.high_risk", {"url": record["url"], "risk_level": record.get("risk_level"), "priority_score": record.get("priority_score"), "output_file": output_file}, "mcpscope")
             emitted += 1
         except Exception:
             continue
