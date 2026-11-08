@@ -31,8 +31,10 @@ test("redacted record page publishes only masked tool names", async () => {
   const html = await readFile(path.join(siteRoot, "records.html"), "utf8");
   const raw = await readFile(path.join(siteRoot, "data", "public-records.json"), "utf8");
   const geographyRaw = await readFile(path.join(siteRoot, "data", "public-geography.json"), "utf8");
+  const mapRaw = await readFile(path.join(siteRoot, "data", "world-map.js"), "utf8");
   const data = JSON.parse(raw);
   const geography = JSON.parse(geographyRaw);
+  const map = JSON.parse(mapRaw.slice(mapRaw.indexOf("=") + 1).replace(/;\s*$/, ""));
   assert.match(html, /脱敏记录/);
   assert.match(html, /public-records\.js/);
   assert.match(html, /world-map/);
@@ -45,6 +47,8 @@ test("redacted record page publishes only masked tool names", async () => {
   assert.equal(geography.totals.unresolved, 39);
   assert.ok(geography.countries.some((country) => country.label === "中国" && country.count === 32));
   assert.doesNotMatch(geographyRaw, /San Jose|目标地址|IPv4地址|城市/);
+  assert.ok(map.countries.some((country) => country.id === "156"));
+  assert.ok(!map.countries.some((country) => country.id === "158"));
 });
 
 

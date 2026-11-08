@@ -10,6 +10,7 @@ from typing import Any, Iterable, List, Sequence, Tuple
 
 WIDTH = 1200
 HEIGHT = 520
+ANTIMERIDIAN_GAP = WIDTH / 2
 
 
 def decode_arcs(document: dict[str, Any]) -> list[list[tuple[float, float]]]:
@@ -39,7 +40,22 @@ def join_ring(indices: Sequence[int], arcs: list[list[tuple[float, float]]]) -> 
             points.extend(part[1:])
         else:
             points.extend(part)
-    return "M" + " ".join(f"{x:g},{y:g}" for x, y in points) + "Z"
+    if not points:
+        return ""
+
+    # Split rings at the left/right map edge. Without this break, Russia,
+    # Alaska and islands near 180 degrees are drawn as long diagonals across
+    # the entire map.
+    parts: list[list[tuple[float, float]]] = [[]]
+    for point in points:
+        if parts[-1] and abs(point[0] - parts[-1][-1][0]) > ANTIMERIDIAN_GAP:
+            parts.append([])
+        parts[-1].append(point)
+    return "".join(
+        "M" + " ".join(f"{x:g},{y:g}" for x, y in part) + "Z"
+        for part in parts
+        if part
+    )
 
 
 def geometry_path(geometry: dict[str, Any], arcs: list[list[tuple[float, float]]]) -> str:
@@ -60,18 +76,26 @@ def main() -> int:
     document = json.loads(args.source.read_text(encoding="utf-8"))
     arcs = decode_arcs(document)
     geometries = document["objects"]["countries"]["geometries"]
-    countries = []
+    countries_by_id: dict[str, dict[str, str]] = {}
     for geometry in geometries:
         path = geometry_path(geometry, arcs)
         if not path:
             continue
-        countries.append(
-            {
-                "id": str(geometry.get("id", "")),
-                "name": geometry.get("properties", {}).get("name", ""),
-                "path": path,
-            }
-        )
+        country_id = str(geometry.get("id", ""))
+        country = {
+            "id": country_id,
+            "name": geometry.get("properties", {}).get("name", ""),
+            "path": path,
+        }
+        countries_by_id[country_id] = country
+
+    # Keep the public map aligned with the site's country-level China
+    # aggregation instead of rendering a separate Taiwan data layer.
+    if "158" in countries_by_id and "156" in countries_by_id:
+        countries_by_id["156"]["path"] += countries_by_id["158"]["path"]
+        del countries_by_id["158"]
+
+    countries = list(countries_by_id.values())
 
     land_path = "".join(country["path"] for country in countries)
     payload = {
