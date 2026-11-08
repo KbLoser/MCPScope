@@ -21,11 +21,103 @@ DEFAULT_OUTPUT = ROOT / "site" / "data" / "public-summary.json"
 DEFAULT_FALLBACK = ROOT / "site" / "data" / "public-summary.js"
 DEFAULT_RECORDS = ROOT / "site" / "data" / "public-records.json"
 DEFAULT_RECORDS_FALLBACK = ROOT / "site" / "data" / "public-records.js"
+DEFAULT_GEOGRAPHY = (
+    ROOT.parent.parent
+    / "获取工具列表"
+    / "18_手动测试结果合并_2026-07-23"
+    / "MCP功能分类抽样_619个不同主机_含IP地区.csv"
+)
+DEFAULT_GEOGRAPHY_OUTPUT = ROOT / "site" / "data" / "public-geography.json"
+DEFAULT_GEOGRAPHY_FALLBACK = ROOT / "site" / "data" / "public-geography.js"
 
 SOURCE_LABELS = {
     "无认证扫描累计": "无认证扫描累计",
     "IP地址工具数据": "IP 地址工具数据",
     "未获取工具; Curl协议复测": "Curl 协议复测",
+}
+
+COUNTRY_ALIASES = {
+    "The Netherlands": "Netherlands",
+    "Hong Kong": "China",
+    "Taiwan": "China",
+}
+
+COUNTRY_LABELS = {
+    "United States": "美国",
+    "Canada": "加拿大",
+    "Germany": "德国",
+    "China": "中国",
+    "France": "法国",
+    "India": "印度",
+    "Japan": "日本",
+    "Russia": "俄罗斯",
+    "United Kingdom": "英国",
+    "Netherlands": "荷兰",
+    "Singapore": "新加坡",
+    "South Korea": "韩国",
+    "Ireland": "爱尔兰",
+    "Finland": "芬兰",
+    "Sweden": "瑞典",
+    "Latvia": "拉脱维亚",
+    "Brazil": "巴西",
+    "Hungary": "匈牙利",
+    "Switzerland": "瑞士",
+    "Thailand": "泰国",
+    "United Arab Emirates": "阿联酋",
+    "Luxembourg": "卢森堡",
+    "Belarus": "白俄罗斯",
+    "Indonesia": "印度尼西亚",
+    "Turkey": "土耳其",
+    "Poland": "波兰",
+    "Qatar": "卡塔尔",
+    "Guinea": "几内亚",
+    "New Zealand": "新西兰",
+    "Belgium": "比利时",
+    "Mexico": "墨西哥",
+    "Czechia": "捷克",
+    "Italy": "意大利",
+    "Austria": "奥地利",
+    "Bulgaria": "保加利亚",
+    "Chile": "智利",
+}
+
+COUNTRY_IDS = {
+    "United States": "840",
+    "Canada": "124",
+    "Germany": "276",
+    "China": "156",
+    "France": "250",
+    "India": "356",
+    "Japan": "392",
+    "Russia": "643",
+    "United Kingdom": "826",
+    "Netherlands": "528",
+    "Singapore": "702",
+    "South Korea": "410",
+    "Ireland": "372",
+    "Finland": "246",
+    "Sweden": "752",
+    "Latvia": "428",
+    "Brazil": "076",
+    "Hungary": "348",
+    "Switzerland": "756",
+    "Thailand": "764",
+    "United Arab Emirates": "784",
+    "Luxembourg": "442",
+    "Belarus": "112",
+    "Indonesia": "360",
+    "Turkey": "792",
+    "Poland": "616",
+    "Qatar": "634",
+    "Guinea": "324",
+    "New Zealand": "554",
+    "Belgium": "056",
+    "Mexico": "484",
+    "Czechia": "203",
+    "Italy": "380",
+    "Austria": "040",
+    "Bulgaria": "100",
+    "Chile": "152",
 }
 
 CASE_TEMPLATES = [
@@ -154,6 +246,70 @@ def build_public_records(vulnerabilities: List[Dict[str, str]]) -> Dict[str, Any
     }
 
 
+def normalize_country(value: str) -> str:
+    country = value.strip().split("/", 1)[0].strip() if value else ""
+    if not country or country == "UN":
+        return "未解析"
+    return COUNTRY_ALIASES.get(country, country)
+
+
+def build_public_geography(vulnerabilities: List[Dict[str, str]]) -> Dict[str, Any]:
+    country_counts: Counter[str] = Counter()
+    source_counts: Dict[str, Counter[str]] = {}
+    for row in vulnerabilities:
+        country = normalize_country(row.get("地区", ""))
+        country_counts[country] += 1
+        source = SOURCE_LABELS.get(row.get("数据来源", "").strip(), "其他来源")
+        source_counts.setdefault(country, Counter())[source] += 1
+
+    published = []
+    for country, count in sorted(country_counts.items(), key=lambda item: (-item[1], item[0])):
+        if country == "未解析":
+            country_id = "unresolved"
+            label = "未解析地区"
+        else:
+            country_id = COUNTRY_IDS.get(country, "")
+            label = COUNTRY_LABELS.get(country, country)
+        published.append(
+            {
+                "id": country_id,
+                "label": label,
+                "count": count,
+                "source_counts": [
+                    {"label": source, "value": value}
+                    for source, value in sorted(source_counts[country].items(), key=lambda item: (-item[1], item[0]))
+                ],
+            }
+        )
+
+    return {
+        "schema_version": 1,
+        "publication": {
+            "label": "国家级脱敏地理统计",
+            "granularity": "国家或地区级",
+            "exact_locations_published": False,
+            "raw_addresses_published": False,
+            "notes": "地区值按国家级聚合；中国香港、中国台湾归入中国，未解析值单列。",
+        },
+        "totals": {
+            "records": sum(country_counts.values()),
+            "countries": sum(1 for country in country_counts if country != "未解析"),
+            "unresolved": country_counts.get("未解析", 0),
+        },
+        "countries": published,
+    }
+
+
+def validate_public_geography(document: Dict[str, Any]) -> None:
+    serialized = json.dumps(document, ensure_ascii=False)
+    if re.search(r"https?://|\b(?:\d{1,3}\.){3}\d{1,3}\b|::", serialized):
+        raise ValueError("public geography contains a network address")
+    if document.get("publication", {}).get("exact_locations_published"):
+        raise ValueError("public geography publishes exact locations")
+    if any("city" in json.dumps(item, ensure_ascii=False).lower() for item in document.get("countries", [])):
+        raise ValueError("public geography contains city-level data")
+
+
 def validate_public_records(document: Dict[str, Any], raw_tool_names: Iterable[str] = ()) -> None:
     serialized = json.dumps(document, ensure_ascii=False)
     if re.search(r"https?://|\b(?:\d{1,3}\.){3}\d{1,3}\b", serialized):
@@ -198,16 +354,21 @@ def validate_public_summary(document: Dict[str, Any]) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the redacted MCPScope website data file.")
     parser.add_argument("--vulnerabilities", type=Path, default=DEFAULT_VULNERABILITIES)
+    parser.add_argument("--geography", type=Path, default=DEFAULT_GEOGRAPHY)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    document = build_summary(read_csv(args.vulnerabilities))
-    records = build_public_records(read_csv(args.vulnerabilities))
+    vulnerabilities = read_csv(args.vulnerabilities)
+    document = build_summary(vulnerabilities)
+    records = build_public_records(vulnerabilities)
+    geography_rows = read_csv(args.geography) if args.geography.exists() else vulnerabilities
+    geography = build_public_geography(geography_rows)
     validate_public_summary(document)
     validate_public_records(records, (row.get("工具名称 (Tool Name)", "") for row in read_csv(args.vulnerabilities)))
+    validate_public_geography(geography)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     serialized = json.dumps(document, ensure_ascii=False, indent=2)
     args.output.write_text(serialized + "\n", encoding="utf-8")
@@ -219,6 +380,12 @@ def main() -> int:
     DEFAULT_RECORDS.write_text(records_serialized + "\n", encoding="utf-8")
     DEFAULT_RECORDS_FALLBACK.write_text(
         "window.MCPSCOPE_PUBLIC_RECORDS = " + records_serialized + ";\n",
+        encoding="utf-8",
+    )
+    geography_serialized = json.dumps(geography, ensure_ascii=False, indent=2)
+    DEFAULT_GEOGRAPHY_OUTPUT.write_text(geography_serialized + "\n", encoding="utf-8")
+    DEFAULT_GEOGRAPHY_FALLBACK.write_text(
+        "window.MCPSCOPE_PUBLIC_GEOGRAPHY = " + geography_serialized + ";\n",
         encoding="utf-8",
     )
     print(f"wrote redacted public summary: {args.output}")

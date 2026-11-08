@@ -437,6 +437,24 @@ canvas {
   line-height: 1.85;
 }
 
+.section-heading-side {
+  display: grid;
+  align-content: end;
+  justify-items: start;
+  gap: 20px;
+}
+
+.section-heading-side > p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 1.85;
+}
+
+.section-action {
+  gap: 14px;
+}
+
 .heading-grid-dark > p {
   color: #aebfb7;
 }

@@ -1,4 +1,5 @@
 const RECORDS_URL = "data/public-records.json";
+const GEOGRAPHY_URL = "data/public-geography.json";
 const PAGE_SIZE = 24;
 
 const state = {
@@ -37,6 +38,74 @@ function populateSelect(select, values) {
     option.textContent = value;
     select.append(option);
   });
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat("zh-CN").format(value);
+}
+
+function renderMapDetail(country) {
+  document.querySelector("#map-detail-title").textContent = country.label;
+  document.querySelector("#map-detail-count").textContent = formatNumber(country.count);
+  document.querySelector("#map-detail-note").textContent = "仅展示国家级脱敏统计，不显示原始目标、城市或工具名称。";
+  const sources = document.querySelector("#map-detail-sources");
+  sources.replaceChildren();
+  country.source_counts.forEach((source) => {
+    const row = document.createElement("div");
+    row.className = "map-detail-source";
+    const label = document.createElement("span");
+    label.textContent = source.label;
+    const value = document.createElement("strong");
+    value.textContent = formatNumber(source.value);
+    row.append(label, value);
+    sources.append(row);
+  });
+}
+
+function renderGeography(data) {
+  const countryData = new Map(data.countries.map((country) => [country.id, country]));
+  document.querySelector("#map-record-count").textContent = formatNumber(data.totals.records);
+  document.querySelector("#map-country-count").textContent = formatNumber(data.totals.countries);
+  document.querySelector("#map-unresolved-count").textContent = formatNumber(data.totals.unresolved);
+
+  const land = document.querySelector("[data-map-land]");
+  const countries = document.querySelector("[data-map-countries]");
+  land.setAttribute("d", window.MCPSCOPE_WORLD_MAP.land_path);
+  countries.replaceChildren();
+
+  const mapped = data.countries.filter((country) => country.id !== "unresolved" && countryData.has(country.id));
+  const max = Math.max(...mapped.map((country) => country.count), 1);
+  const levelFor = (count) => {
+    const ratio = count / max;
+    if (ratio >= 0.5) return "4";
+    if (ratio >= 0.2) return "3";
+    if (ratio >= 0.05) return "2";
+    return "1";
+  };
+
+  window.MCPSCOPE_WORLD_MAP.countries.forEach((countryShape) => {
+    const country = countryData.get(countryShape.id) || (countryShape.id === "158" ? countryData.get("156") : null);
+    if (!country) return;
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.classList.add("world-country");
+    path.setAttribute("d", countryShape.path);
+    path.setAttribute("tabindex", "0");
+    path.setAttribute("role", "button");
+    path.setAttribute("aria-label", `${country.label}，${formatNumber(country.count)} 条记录`);
+    path.dataset.level = levelFor(country.count);
+    const activate = () => {
+      document.querySelectorAll(".world-country.is-active").forEach((item) => item.classList.remove("is-active"));
+      path.classList.add("is-active");
+      renderMapDetail(country);
+    };
+    path.addEventListener("pointerenter", activate);
+    path.addEventListener("focus", activate);
+    path.addEventListener("click", activate);
+    countries.append(path);
+  });
+
+  const largest = data.countries.find((country) => country.id !== "unresolved");
+  if (largest) renderMapDetail(largest);
 }
 
 function createRecordRow(record) {
@@ -153,16 +222,26 @@ function showError() {
 async function main() {
   setupNavigation();
   const fallback = window.MCPSCOPE_PUBLIC_RECORDS;
-  if (window.location.protocol === "file:" && fallback) {
+  const geographyFallback = window.MCPSCOPE_PUBLIC_GEOGRAPHY;
+  if (window.location.protocol === "file:" && fallback && geographyFallback) {
     renderData(fallback);
+    renderGeography(geographyFallback);
     return;
   }
   try {
-    const response = await fetch(RECORDS_URL, { cache: "no-store" });
-    if (!response.ok) throw new Error(`record request failed: ${response.status}`);
-    renderData(await response.json());
+    const [recordsResponse, geographyResponse] = await Promise.all([
+      fetch(RECORDS_URL, { cache: "no-store" }),
+      fetch(GEOGRAPHY_URL, { cache: "no-store" }),
+    ]);
+    if (!recordsResponse.ok) throw new Error(`record request failed: ${recordsResponse.status}`);
+    if (!geographyResponse.ok) throw new Error(`geography request failed: ${geographyResponse.status}`);
+    renderData(await recordsResponse.json());
+    renderGeography(await geographyResponse.json());
   } catch (error) {
-    if (fallback) renderData(fallback);
+    if (fallback && geographyFallback) {
+      renderData(fallback);
+      renderGeography(geographyFallback);
+    }
     else {
       console.error(error);
       showError();

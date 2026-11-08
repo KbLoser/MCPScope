@@ -14,6 +14,195 @@
   background: var(--forest-dark);
 }
 
+.records-map-section {
+  padding: 94px 0 104px;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+}
+
+.map-summary {
+  display: grid;
+  max-width: 760px;
+  margin: -12px 0 48px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.map-summary div {
+  padding: 18px 24px 18px 0;
+  border-right: 1px solid var(--line);
+}
+
+.map-summary div:not(:first-child) {
+  padding-left: 24px;
+}
+
+.map-summary div:last-child {
+  border-right: 0;
+}
+
+.map-summary strong {
+  display: block;
+  color: var(--forest);
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.map-summary span {
+  display: block;
+  margin-top: 9px;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.world-map-layout {
+  display: grid;
+  align-items: stretch;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.45fr);
+}
+
+.world-map-wrap {
+  min-width: 0;
+  padding: 18px 18px 14px;
+  border: 1px solid var(--line);
+  background: #f3f7f4;
+}
+
+.world-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.world-land {
+  fill: #e3ebe6;
+  stroke: #cad6cf;
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.world-country {
+  fill: #76aaa1;
+  stroke: #f3f7f4;
+  stroke-width: 0.8;
+  cursor: pointer;
+  opacity: 0.96;
+  outline: none;
+  vector-effect: non-scaling-stroke;
+  transition: fill 140ms ease, opacity 140ms ease;
+}
+
+.world-country[data-level="1"] { fill: #b8d5ce; }
+.world-country[data-level="2"] { fill: #82b9ae; }
+.world-country[data-level="3"] { fill: #39877e; }
+.world-country[data-level="4"] { fill: #166257; }
+
+.world-country:hover,
+.world-country:focus,
+.world-country.is-active {
+  fill: var(--amber);
+  opacity: 1;
+  stroke: var(--forest-dark);
+  stroke-width: 1.4;
+}
+
+.map-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.map-legend-scale {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.map-legend-scale i {
+  display: block;
+  width: 22px;
+  height: 8px;
+}
+
+.map-legend-scale i:nth-child(1) { background: #b8d5ce; }
+.map-legend-scale i:nth-child(2) { background: #82b9ae; }
+.map-legend-scale i:nth-child(3) { background: #39877e; }
+.map-legend-scale i:nth-child(4) { background: #166257; }
+
+.map-detail {
+  min-height: 230px;
+  padding: 28px;
+  color: #eaf2ee;
+  background: var(--forest);
+}
+
+.map-detail-kicker {
+  margin: 0;
+  color: #9cd4cd;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.map-detail h3 {
+  margin: 24px 0 18px;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.map-detail-count {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.map-detail-count strong {
+  color: #9cd4cd;
+  font-size: 40px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.map-detail-count span {
+  color: #b8cbc2;
+  font-size: 13px;
+}
+
+.map-detail > p:not(.map-detail-kicker) {
+  margin: 17px 0 0;
+  color: #c0d1c9;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.map-detail-sources {
+  display: grid;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.map-detail-source {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #d8e5df;
+  font-size: 12px;
+}
+
+.map-detail-source strong {
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
 .back-link {
   display: inline-flex;
   margin-bottom: 58px;
@@ -309,6 +498,14 @@
     grid-template-columns: 1fr;
   }
 
+  .world-map-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .map-detail {
+    min-height: 0;
+  }
+
   .record-controls {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -335,6 +532,10 @@
   .records-hero {
     min-height: 0;
     padding: 116px 0 48px;
+  }
+
+  .records-map-section {
+    padding: 76px 0 84px;
   }
 
   .back-link {
@@ -372,6 +573,36 @@
 
   .records-section-heading h2 {
     font-size: 32px;
+  }
+
+  .map-summary {
+    margin-top: 0;
+  }
+
+  .map-summary div,
+  .map-summary div:not(:first-child) {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .map-summary div:first-child {
+    padding-left: 0;
+  }
+
+  .map-summary div:last-child {
+    padding-right: 0;
+  }
+
+  .map-summary strong {
+    font-size: 25px;
+  }
+
+  .world-map-wrap {
+    padding: 10px 8px 12px;
+  }
+
+  .map-detail {
+    padding: 24px;
   }
 
   .record-controls {

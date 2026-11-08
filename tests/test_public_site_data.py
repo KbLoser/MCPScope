@@ -47,6 +47,21 @@ class PublicSiteDataTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             MODULE.validate_public_summary({"case": "https://target.example/mcp"})
 
+    def test_geography_is_country_level_and_reconciles(self):
+        geography = MODULE.build_public_geography(
+            [
+                {"地区": "United States / California / San Jose", "数据来源": "无认证扫描累计"},
+                {"地区": "Hong Kong /  /  ", "数据来源": "IP地址工具数据"},
+                {"地区": "Taiwan /  /  ", "数据来源": "无认证扫描累计"},
+                {"地区": "UN", "数据来源": "Curl协议复测"},
+            ]
+        )
+        MODULE.validate_public_geography(geography)
+        self.assertEqual(geography["totals"], {"records": 4, "countries": 2, "unresolved": 1})
+        self.assertEqual(geography["countries"][0]["label"], "中国")
+        self.assertEqual(geography["countries"][0]["count"], 2)
+        self.assertNotIn("San Jose", json.dumps(geography, ensure_ascii=False))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -30,13 +30,21 @@ test("research site contains the required narrative sections", async () => {
 test("redacted record page publishes only masked tool names", async () => {
   const html = await readFile(path.join(siteRoot, "records.html"), "utf8");
   const raw = await readFile(path.join(siteRoot, "data", "public-records.json"), "utf8");
+  const geographyRaw = await readFile(path.join(siteRoot, "data", "public-geography.json"), "utf8");
   const data = JSON.parse(raw);
+  const geography = JSON.parse(geographyRaw);
   assert.match(html, /脱敏记录/);
   assert.match(html, /public-records\.js/);
+  assert.match(html, /world-map/);
+  assert.match(html, /public-geography\.js/);
   assert.equal(data.records.length, 619);
   assert.ok(data.records.every((record) => /\*{3,}/.test(record.masked_tool_name)));
   assert.doesNotMatch(raw, /https?:\/\//);
   assert.doesNotMatch(raw, /"(?:mcp_id|tool_id|target|hostname|raw_tool_name)"/);
+  assert.equal(geography.totals.records, 619);
+  assert.equal(geography.totals.unresolved, 39);
+  assert.ok(geography.countries.some((country) => country.label === "中国" && country.count === 32));
+  assert.doesNotMatch(geographyRaw, /San Jose|目标地址|IPv4地址|城市/);
 });
 
 

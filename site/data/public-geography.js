@@ -1,0 +1,492 @@
+window.MCPSCOPE_PUBLIC_GEOGRAPHY = {
+  "schema_version": 1,
+  "publication": {
+    "label": "国家级脱敏地理统计",
+    "granularity": "国家或地区级",
+    "exact_locations_published": false,
+    "raw_addresses_published": false,
+    "notes": "地区值按国家级聚合；中国香港、中国台湾归入中国，未解析值单列。"
+  },
+  "totals": {
+    "records": 619,
+    "countries": 36,
+    "unresolved": 39
+  },
+  "countries": [
+    {
+      "id": "840",
+      "label": "美国",
+      "count": 214,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 198
+        },
+        {
+          "label": "IP 地址工具数据",
+          "value": 11
+        },
+        {
+          "label": "Curl 协议复测",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "id": "124",
+      "label": "加拿大",
+      "count": 131,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 128
+        },
+        {
+          "label": "Curl 协议复测",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "276",
+      "label": "德国",
+      "count": 69,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 56
+        },
+        {
+          "label": "IP 地址工具数据",
+          "value": 10
+        },
+        {
+          "label": "Curl 协议复测",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "unresolved",
+      "label": "未解析地区",
+      "count": 39,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 39
+        }
+      ]
+    },
+    {
+      "id": "156",
+      "label": "中国",
+      "count": 32,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 25
+        },
+        {
+          "label": "IP 地址工具数据",
+          "value": 6
+        },
+        {
+          "label": "Curl 协议复测",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "250",
+      "label": "法国",
+      "count": 23,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 20
+        },
+        {
+          "label": "IP 地址工具数据",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "356",
+      "label": "印度",
+      "count": 13,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 11
+        },
+        {
+          "label": "Curl 协议复测",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "392",
+      "label": "日本",
+      "count": 11,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 11
+        }
+      ]
+    },
+    {
+      "id": "528",
+      "label": "荷兰",
+      "count": 10,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "643",
+      "label": "俄罗斯",
+      "count": 10,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 6
+        },
+        {
+          "label": "Curl 协议复测",
+          "value": 2
+        },
+        {
+          "label": "IP 地址工具数据",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "826",
+      "label": "英国",
+      "count": 8,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 8
+        }
+      ]
+    },
+    {
+      "id": "702",
+      "label": "新加坡",
+      "count": 7,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 6
+        },
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "246",
+      "label": "芬兰",
+      "count": 6,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 4
+        },
+        {
+          "label": "IP 地址工具数据",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "372",
+      "label": "爱尔兰",
+      "count": 6,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "id": "410",
+      "label": "韩国",
+      "count": 6,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "id": "428",
+      "label": "拉脱维亚",
+      "count": 4,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 3
+        },
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "752",
+      "label": "瑞典",
+      "count": 4,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 3
+        },
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "076",
+      "label": "巴西",
+      "count": 3,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "348",
+      "label": "匈牙利",
+      "count": 2,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "756",
+      "label": "瑞士",
+      "count": 2,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "764",
+      "label": "泰国",
+      "count": 2,
+      "source_counts": [
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        },
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "784",
+      "label": "阿联酋",
+      "count": 2,
+      "source_counts": [
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        },
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "040",
+      "label": "奥地利",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "112",
+      "label": "白俄罗斯",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "056",
+      "label": "比利时",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "100",
+      "label": "保加利亚",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "152",
+      "label": "智利",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "203",
+      "label": "捷克",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "324",
+      "label": "几内亚",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "360",
+      "label": "印度尼西亚",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "380",
+      "label": "意大利",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "442",
+      "label": "卢森堡",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "484",
+      "label": "墨西哥",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "554",
+      "label": "新西兰",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "616",
+      "label": "波兰",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "634",
+      "label": "卡塔尔",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "无认证扫描累计",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "792",
+      "label": "土耳其",
+      "count": 1,
+      "source_counts": [
+        {
+          "label": "IP 地址工具数据",
+          "value": 1
+        }
+      ]
+    }
+  ]
+};

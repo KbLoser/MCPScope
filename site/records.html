@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="css/site.css">
   <link rel="stylesheet" href="css/records.css">
   <script src="data/public-records.js" defer></script>
+  <script src="data/public-geography.js" defer></script>
+  <script src="data/world-map.js" defer></script>
   <script src="js/records.js" defer></script>
 </head>
 <body class="records-page">
@@ -30,7 +32,6 @@
         <a href="index.html#dataset">数据</a>
         <a href="index.html#findings">发现</a>
         <a href="index.html#cases">案例</a>
-        <a href="records.html" aria-current="page">记录</a>
         <a href="index.html#boundaries">边界</a>
         <a class="nav-repository" href="https://github.com/KbLoser/MCPScope" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
       </nav>
@@ -49,6 +50,43 @@
           <div><strong id="total-count">619</strong><span>全部记录</span></div>
           <div><strong id="category-count">10</strong><span>能力类别</span></div>
           <div><strong id="source-count">3</strong><span>数据来源</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="records-map-section" aria-labelledby="records-map-title">
+      <div class="records-inner">
+        <div class="records-section-heading">
+          <div>
+            <p class="section-index">COUNTRY DISTRIBUTION</p>
+            <h2 id="records-map-title">按国家查看记录分布</h2>
+          </div>
+          <p>地图按国家级聚合，鼠标悬停或键盘聚焦国家即可查看记录数和来源构成。未解析地区单独统计，不展示城市、地址或精确坐标。</p>
+        </div>
+
+        <div class="map-summary" aria-label="国家级统计概览">
+          <div><strong id="map-record-count">619</strong><span>地图记录</span></div>
+          <div><strong id="map-country-count">36</strong><span>国家或地区</span></div>
+          <div><strong id="map-unresolved-count">39</strong><span>未解析地区</span></div>
+        </div>
+
+        <div class="world-map-layout">
+          <div class="world-map-wrap">
+            <svg id="world-map" class="world-map" viewBox="0 0 1200 520" role="img" aria-labelledby="world-map-title world-map-desc">
+              <title id="world-map-title">619 条记录的国家级分布图</title>
+              <desc id="world-map-desc">国家颜色深浅表示记录数量，鼠标悬停或键盘聚焦可查看该国家的脱敏统计。</desc>
+              <path class="world-land" data-map-land d=""></path>
+              <g class="world-countries" data-map-countries></g>
+            </svg>
+            <div class="map-legend"><span class="map-legend-low">较少</span><span class="map-legend-scale" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>较多</span></div>
+          </div>
+          <aside class="map-detail" aria-live="polite" aria-label="国家统计详情">
+            <p class="map-detail-kicker">COUNTRY DETAIL</p>
+            <h3 id="map-detail-title">悬停地图查看国家数据</h3>
+            <div class="map-detail-count"><strong id="map-detail-count">—</strong><span>条记录</span></div>
+            <p id="map-detail-note">只显示国家级脱敏统计，不显示原始目标或工具名称。</p>
+            <div id="map-detail-sources" class="map-detail-sources"></div>
+          </aside>
         </div>
       </div>
     </section>
