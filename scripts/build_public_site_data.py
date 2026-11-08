@@ -19,6 +19,8 @@ DEFAULT_VULNERABILITIES = (
 )
 DEFAULT_OUTPUT = ROOT / "site" / "data" / "public-summary.json"
 DEFAULT_FALLBACK = ROOT / "site" / "data" / "public-summary.js"
+DEFAULT_RECORDS = ROOT / "site" / "data" / "public-records.json"
+DEFAULT_RECORDS_FALLBACK = ROOT / "site" / "data" / "public-records.js"
 
 SOURCE_LABELS = {
     "无认证扫描累计": "无认证扫描累计",
@@ -123,6 +125,51 @@ def build_summary(vulnerabilities: List[Dict[str, str]]) -> Dict[str, Any]:
     }
 
 
+def redact_tool_name(name: str) -> str:
+    value = name.strip()
+    if len(value) <= 2:
+        return "*" * max(1, len(value))
+    return f"{value[0]}***{value[-1]}"
+
+
+def build_public_records(vulnerabilities: List[Dict[str, str]]) -> Dict[str, Any]:
+    records = []
+    for index, row in enumerate(vulnerabilities, start=1):
+        records.append(
+            {
+                "record_id": f"V-{index:04d}",
+                "masked_tool_name": redact_tool_name(row.get("工具名称 (Tool Name)", "")),
+                "category": row.get("工具功能分类", "").strip(),
+                "source": SOURCE_LABELS.get(row.get("数据来源", "").strip(), "其他来源"),
+            }
+        )
+    return {
+        "schema_version": 1,
+        "publication": {
+            "label": "619 条脱敏漏洞记录",
+            "raw_targets_published": False,
+            "raw_tool_names_published": False,
+        },
+        "records": records,
+    }
+
+
+def validate_public_records(document: Dict[str, Any], raw_tool_names: Iterable[str] = ()) -> None:
+    serialized = json.dumps(document, ensure_ascii=False)
+    if re.search(r"https?://|\b(?:\d{1,3}\.){3}\d{1,3}\b", serialized):
+        raise ValueError("public records contain a network address")
+    if any(record.get("masked_tool_name", "").count("*") < 3 for record in document["records"]):
+        raise ValueError("public records contain an insufficiently redacted tool name")
+    forbidden_keys = {"mcp_id", "tool_id", "target", "hostname", "url", "raw_tool_name"}
+    for record in document["records"]:
+        if forbidden_keys.intersection(record):
+            raise ValueError("public records contain an identifying field")
+    masked_names = {record.get("masked_tool_name", "") for record in document["records"]}
+    for raw_name in raw_tool_names:
+        if raw_name and raw_name in masked_names:
+            raise ValueError("public records contain a raw tool name")
+
+
 def validate_public_summary(document: Dict[str, Any]) -> None:
     serialized = json.dumps(document, ensure_ascii=False)
     forbidden_keys = {"url", "ip", "hostname", "target", "evidence_path", "raw_response"}
@@ -158,12 +205,20 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     document = build_summary(read_csv(args.vulnerabilities))
+    records = build_public_records(read_csv(args.vulnerabilities))
     validate_public_summary(document)
+    validate_public_records(records, (row.get("工具名称 (Tool Name)", "") for row in read_csv(args.vulnerabilities)))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     serialized = json.dumps(document, ensure_ascii=False, indent=2)
     args.output.write_text(serialized + "\n", encoding="utf-8")
     DEFAULT_FALLBACK.write_text(
         "window.MCPSCOPE_PUBLIC_SUMMARY = " + serialized + ";\n",
+        encoding="utf-8",
+    )
+    records_serialized = json.dumps(records, ensure_ascii=False, indent=2)
+    DEFAULT_RECORDS.write_text(records_serialized + "\n", encoding="utf-8")
+    DEFAULT_RECORDS_FALLBACK.write_text(
+        "window.MCPSCOPE_PUBLIC_RECORDS = " + records_serialized + ";\n",
         encoding="utf-8",
     )
     print(f"wrote redacted public summary: {args.output}")

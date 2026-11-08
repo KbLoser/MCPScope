@@ -27,6 +27,19 @@ test("research site contains the required narrative sections", async () => {
 });
 
 
+test("redacted record page publishes only masked tool names", async () => {
+  const html = await readFile(path.join(siteRoot, "records.html"), "utf8");
+  const raw = await readFile(path.join(siteRoot, "data", "public-records.json"), "utf8");
+  const data = JSON.parse(raw);
+  assert.match(html, /脱敏记录/);
+  assert.match(html, /public-records\.js/);
+  assert.equal(data.records.length, 619);
+  assert.ok(data.records.every((record) => /\*{3,}/.test(record.masked_tool_name)));
+  assert.doesNotMatch(raw, /https?:\/\//);
+  assert.doesNotMatch(raw, /"(?:mcp_id|tool_id|target|hostname|raw_tool_name)"/);
+});
+
+
 test("navigation only restores the top position for a URL without an anchor", async () => {
   const javascript = await readFile(path.join(siteRoot, "js", "main.js"), "utf8");
   assert.match(javascript, /if \(!window\.location\.hash\)/);

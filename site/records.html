@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MCPScope 619 条脱敏漏洞记录。">
+  <meta name="theme-color" content="#10231d">
+  <title>脱敏记录 | MCPScope</title>
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="stylesheet" href="css/records.css">
+  <script src="data/public-records.js" defer></script>
+  <script src="js/records.js" defer></script>
+</head>
+<body class="records-page">
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" data-header>
+    <div class="header-inner">
+      <a class="brand" href="index.html#overview" aria-label="MCPScope 首页">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>MCPScope</span>
+      </a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-navigation" data-menu-button>
+        <span class="menu-icon" aria-hidden="true">☰</span>
+        <span class="sr-only">打开导航</span>
+      </button>
+      <nav class="primary-navigation" id="primary-navigation" aria-label="主要导航" data-navigation>
+        <a href="index.html#problem">问题</a>
+        <a href="index.html#method">方法</a>
+        <a href="index.html#dataset">数据</a>
+        <a href="index.html#findings">发现</a>
+        <a href="index.html#cases">案例</a>
+        <a href="records.html" aria-current="page">记录</a>
+        <a href="index.html#boundaries">边界</a>
+        <a class="nav-repository" href="https://github.com/KbLoser/MCPScope" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="records-hero" id="records" aria-labelledby="records-title">
+      <div class="records-inner">
+        <a class="back-link" href="index.html#findings">← 返回研究发现</a>
+        <p class="eyebrow">REDACTED VULNERABILITY RECORDS</p>
+        <h1 id="records-title">619 条脱敏记录</h1>
+        <p class="records-lede">逐条展示工具能力分类、数据来源和脱敏工具名。目标地址、mcp_id、工具 ID、原始名称、请求与响应均不公开。</p>
+
+        <div class="records-stats" aria-label="记录概览">
+          <div><strong id="total-count">619</strong><span>全部记录</span></div>
+          <div><strong id="category-count">10</strong><span>能力类别</span></div>
+          <div><strong id="source-count">3</strong><span>数据来源</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="records-section" aria-labelledby="records-list-title">
+      <div class="records-inner">
+        <div class="records-section-heading">
+          <div>
+            <p class="section-index">RECORD INDEX</p>
+            <h2 id="records-list-title">按类别浏览</h2>
+          </div>
+          <p>搜索只匹配脱敏后的记录编号与工具名，不会触达原始工具名称。</p>
+        </div>
+
+        <div class="record-controls" role="search" aria-label="筛选脱敏记录">
+          <label class="record-search">
+            <span>搜索记录</span>
+            <input id="record-search" type="search" placeholder="例如 V-0001 或 j***s" autocomplete="off">
+          </label>
+          <label>
+            <span>能力类别</span>
+            <select id="category-filter"><option value="">全部类别</option></select>
+          </label>
+          <label>
+            <span>数据来源</span>
+            <select id="source-filter"><option value="">全部来源</option></select>
+          </label>
+          <button class="reset-button" id="reset-filters" type="button">重置筛选</button>
+        </div>
+
+        <div class="record-summary" aria-live="polite">
+          <span id="result-count">显示 619 条记录</span>
+          <span id="page-status">第 1 / 26 页</span>
+        </div>
+
+        <div class="record-list" id="record-list" aria-live="polite"></div>
+        <p class="records-error" id="records-error" hidden>脱敏记录加载失败，请通过本地静态服务器或 GitHub Pages 访问。</p>
+
+        <nav class="pagination" aria-label="记录分页">
+          <button id="previous-page" type="button" aria-label="上一页">←</button>
+          <div id="page-buttons"></div>
+          <button id="next-page" type="button" aria-label="下一页">→</button>
+        </nav>
+      </div>
+    </section>
+
+    <section class="records-boundary" aria-labelledby="records-boundary-title">
+      <div class="records-inner boundary-callout">
+        <div>
+          <p class="section-index">PUBLICATION BOUNDARY</p>
+          <h2 id="records-boundary-title">记录用于研究复核，不是可利用清单</h2>
+        </div>
+        <p>本页只帮助读者理解记录的类别和来源。所有工具名称均经过遮蔽，原始目标、凭据、响应内容、请求参数和可直接复现的证据不在公开数据中。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div><strong>MCPScope</strong><span>MCP security research toolkit</span></div>
+      <p>619 条脱敏记录 · 不公开原始目标与响应</p>
+      <a href="#records" aria-label="返回记录页顶部">↑</a>
+    </div>
+  </footer>
+</body>
+</html>

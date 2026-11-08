@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import unittest
 from pathlib import Path
 
@@ -35,6 +36,12 @@ class PublicSiteDataTest(unittest.TestCase):
         self.assertEqual(result["headline"]["unique_tools"], 2)
         self.assertEqual(sum(item["value"] for item in result["record_sources"]), 2)
         self.assertFalse(result["publication"]["raw_targets_published"])
+
+        records = MODULE.build_public_records(vulnerabilities)
+        MODULE.validate_public_records(records)
+        self.assertEqual(len(records["records"]), 2)
+        self.assertTrue(all("***" in item["masked_tool_name"] for item in records["records"]))
+        self.assertNotIn("shell", json.dumps(records, ensure_ascii=False))
 
     def test_redaction_guard_rejects_network_addresses(self):
         with self.assertRaises(ValueError):
