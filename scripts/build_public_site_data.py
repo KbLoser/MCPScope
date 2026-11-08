@@ -5,58 +5,52 @@ import argparse
 import csv
 import json
 import re
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CANDIDATES = ROOT.parent / "高危MCP工具候选清单.csv"
-DEFAULT_CLASSIFIED = ROOT.parent / "高危MCP工具候选清单_142个MCP分类.csv"
+DEFAULT_VULNERABILITIES = (
+    ROOT.parent.parent
+    / "获取工具列表"
+    / "18_手动测试结果合并_2026-07-23"
+    / "mcp619.csv"
+)
 DEFAULT_OUTPUT = ROOT / "site" / "data" / "public-summary.json"
+DEFAULT_FALLBACK = ROOT / "site" / "data" / "public-summary.js"
 
-SCOPE_LABELS = {
-    "operation or impact evidence": "操作或影响证据",
-    "invocation reachability only": "匿名调用可达",
-    "authentication conflict in manual result": "认证结论待复核",
+SOURCE_LABELS = {
+    "无认证扫描累计": "无认证扫描累计",
+    "IP地址工具数据": "IP 地址工具数据",
+    "未获取工具; Curl协议复测": "Curl 协议复测",
 }
 
-PRIMARY_LABELS = {
-    "server-management capabilities": "服务管理与外部操作",
-    "data leakage": "数据泄露",
-    "remote code execution": "远程代码执行",
-    "SQL/database access": "SQL 与数据库访问",
-}
-
-CASE_STUDIES = [
-    {
-        "id": "CASE-RCE-01",
-        "category": "远程代码执行",
-        "title": "匿名命令调用返回固定标记",
-        "summary": "受控测试使用无害输出指令，服务返回成功状态与预期标记，证明远程命令能力可以在未建立业务身份的情况下触达。",
-        "evidence": "操作结果",
-    },
-    {
-        "id": "CASE-SQL-01",
-        "category": "SQL 与数据库访问",
-        "title": "常量查询获得预期结果",
-        "summary": "测试仅使用不访问业务表的常量查询，响应与查询语义一致，表明数据库执行路径缺少必要的访问控制。",
-        "evidence": "操作结果",
-    },
-    {
-        "id": "CASE-LEAK-01",
-        "category": "数据泄露",
-        "title": "错误响应暴露内部连接信息",
-        "summary": "工具后端在处理受控请求时返回内部数据库连接信息。公开案例仅保留证据类型，不包含地址、账号或连接字符串。",
-        "evidence": "影响证据",
-    },
-    {
-        "id": "CASE-OPS-01",
-        "category": "服务管理与外部操作",
-        "title": "匿名请求到达外部管理接口",
-        "summary": "受控调用获得来自管理平面的真实响应，证明操作已经越过工具参数层并触达后端服务。测试未执行破坏性变更。",
-        "evidence": "调用链证据",
-    },
+CASE_TEMPLATES = [
+    (
+        "CASE-STORAGE-01",
+        "文件与内容存储",
+        "文件与内容存储是最大类别",
+        "最新记录中有 {count} 条工具被归入文件与内容存储。公开结果只保留能力分类，不公开目标、请求和响应。",
+    ),
+    (
+        "CASE-COMMS-01",
+        "通信与公开发布",
+        "通信与公开发布是第二大类别",
+        "有 {count} 条记录涉及消息、邮件或公开发布能力。该类别表示工具可以改变外部通信状态，不等于已经证明业务影响。",
+    ),
+    (
+        "CASE-EXEC-01",
+        "主机与代码执行",
+        "主机与代码执行需要优先复核",
+        "有 {count} 条记录被归入主机与代码执行。这是能力层面的高风险信号，实际可达性和影响仍需授权测试。",
+    ),
+    (
+        "CASE-DATABASE-01",
+        "数据库访问与操作",
+        "数据库访问是稳定出现的高风险类别",
+        "有 {count} 条记录涉及数据库访问与操作。结果仅展示统计与分类，不包含查询、连接信息或可复现载荷。",
+    ),
 ]
 
 
@@ -65,81 +59,66 @@ def read_csv(path: Path) -> List[Dict[str, str]]:
         return list(csv.DictReader(source))
 
 
-def split_risks(value: str) -> Iterable[str]:
-    for item in value.replace("；", ";").split(";"):
-        item = item.strip()
-        if item:
-            yield item
-
-
 def count_items(values: Iterable[str], label_map: Dict[str, str] | None = None) -> List[Dict[str, Any]]:
-    counts = Counter(values)
+    counts = Counter(value.strip() for value in values if value and value.strip())
     return [
         {"label": (label_map or {}).get(label, label), "value": value}
         for label, value in sorted(counts.items(), key=lambda item: (-item[1], item[0]))
     ]
 
 
-def service_outcomes(rows: List[Dict[str, str]]) -> List[Dict[str, Any]]:
-    grouped: Dict[str, List[Dict[str, str]]] = defaultdict(list)
-    for row in rows:
-        grouped[row["mcp_id"]].append(row)
-
-    outcomes = Counter()
-    for service_rows in grouped.values():
-        statuses = {row["手动测试状态"] for row in service_rows}
-        if any(row["是否已确认漏洞"] == "是" for row in service_rows):
-            outcomes["证据支持的安全发现"] += 1
-        elif statuses & {"已测试（未确认）", "已测试（功能禁用）", "已测试（参数格式）"}:
-            outcomes["测试后未确认"] += 1
-        elif "已测试（鉴权拦截）" in statuses:
-            outcomes["鉴权拦截"] += 1
-        elif "连接失败" in statuses:
-            outcomes["目标不可达"] += 1
-        else:
-            outcomes["未完成测试"] += 1
-
-    order = ["证据支持的安全发现", "鉴权拦截", "测试后未确认", "目标不可达", "未完成测试"]
-    return [{"label": label, "value": outcomes[label]} for label in order if outcomes[label]]
+def build_cases(categories: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+    counts = {item["label"]: item["value"] for item in categories}
+    cases = []
+    for case_id, category, title, summary in CASE_TEMPLATES:
+        if category not in counts:
+            continue
+        cases.append(
+            {
+                "id": case_id,
+                "category": category,
+                "title": title,
+                "summary": summary.format(count=counts[category]),
+                "evidence": "能力分类记录",
+            }
+        )
+    return cases
 
 
-def build_summary(candidates: List[Dict[str, str]], classified: List[Dict[str, str]]) -> Dict[str, Any]:
-    services = {row["mcp_id"] for row in candidates}
-    tool_names = {row["工具名称 (Tool Name)"] for row in candidates}
-    operation_evidence = sum(
-        row["evidence_scope"] == "operation or impact evidence" for row in classified
-    )
+def build_summary(vulnerabilities: List[Dict[str, str]]) -> Dict[str, Any]:
+    services = {row["mcp_id"].strip() for row in vulnerabilities if row.get("mcp_id", "").strip()}
+    tool_names = {
+        row["工具名称 (Tool Name)"].strip()
+        for row in vulnerabilities
+        if row.get("工具名称 (Tool Name)", "").strip()
+    }
+    categories = count_items(row.get("工具功能分类", "") for row in vulnerabilities)
+    sources = count_items((row.get("数据来源", "") for row in vulnerabilities), SOURCE_LABELS)
+    records = len(vulnerabilities)
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "publication": {
-            "label": "内部研究快照的脱敏汇总",
+            "label": "619 条漏洞记录的脱敏汇总",
             "raw_targets_published": False,
+            "record_definition": "按最新 CSV 中的工具记录统计，不代表每条记录都已完成影响级别验证。",
         },
         "headline": {
             "services": len(services),
-            "candidates": len(candidates),
+            "records": records,
             "unique_tools": len(tool_names),
-            "findings": len(classified),
-            "operation_evidence": operation_evidence,
+            "findings": records,
+            "categories": len(categories),
         },
-        "candidate_severity": count_items(row["候选风险等级"] for row in candidates),
-        "candidate_risk_types": count_items(
-            risk for row in candidates for risk in split_risks(row["高危风险类型"])
-        ),
-        "service_outcomes": service_outcomes(candidates),
-        "finding_categories": count_items(
-            (row["primary_category"] for row in classified), PRIMARY_LABELS
-        ),
-        "evidence_scopes": count_items(
-            (row["evidence_scope"] for row in classified), SCOPE_LABELS
-        ),
-        "case_studies": CASE_STUDIES,
+        "candidate_risk_types": categories,
+        "record_sources": sources,
+        "finding_categories": categories,
+        "case_studies": build_cases(categories),
         "limitations": [
-            "规则命中表示需要审查，不等同于漏洞成立。",
-            "匿名获取工具列表不代表工具调用不需要认证。",
-            "目标不可达不能被解释为目标安全。",
-            "规则不命中仍可能来自命名、描述或覆盖不足。",
+            "619 条记录来自工具能力筛选与复测汇总，不等同于 619 条都已完成影响验证。",
+            "筛选方式以工具名称或描述关键词为主，命名、描述和 Schema 覆盖不足会造成漏报。",
+            "匿名获取工具列表不代表工具调用不需要认证，认证状态仍需在授权范围内单独核验。",
+            "公开页面只展示聚合类别和来源，不发布目标地址、凭据、原始响应或可复现参数。",
         ],
     }
 
@@ -171,18 +150,22 @@ def validate_public_summary(document: Dict[str, Any]) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the redacted MCPScope website data file.")
-    parser.add_argument("--candidates", type=Path, default=DEFAULT_CANDIDATES)
-    parser.add_argument("--classified", type=Path, default=DEFAULT_CLASSIFIED)
+    parser.add_argument("--vulnerabilities", type=Path, default=DEFAULT_VULNERABILITIES)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    document = build_summary(read_csv(args.candidates), read_csv(args.classified))
+    document = build_summary(read_csv(args.vulnerabilities))
     validate_public_summary(document)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    serialized = json.dumps(document, ensure_ascii=False, indent=2)
+    args.output.write_text(serialized + "\n", encoding="utf-8")
+    DEFAULT_FALLBACK.write_text(
+        "window.MCPSCOPE_PUBLIC_SUMMARY = " + serialized + ";\n",
+        encoding="utf-8",
+    )
     print(f"wrote redacted public summary: {args.output}")
     return 0
 

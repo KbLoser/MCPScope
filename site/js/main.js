@@ -248,15 +248,20 @@ function updateNumbers(data) {
     }
   });
 
-  document.querySelectorAll("[data-severity]").forEach((element) => {
-    const item = data.candidate_severity.find((entry) => entry.label === element.dataset.severity);
+  document.querySelectorAll("[data-source]").forEach((element) => {
+    const item = data.record_sources.find((entry) => entry.label === element.dataset.source);
     if (item) element.textContent = formatNumber(item.value);
   });
 
-  document.querySelectorAll("[data-evidence]").forEach((element) => {
-    const item = data.evidence_scopes.find((entry) => entry.label === element.dataset.evidence);
-    if (item) element.textContent = formatNumber(item.value);
-  });
+  const topCategory = data.finding_categories[0];
+  if (topCategory) {
+    document.querySelectorAll("[data-top-category-label]").forEach((element) => {
+      element.textContent = topCategory.label;
+    });
+    document.querySelectorAll("[data-top-category-percent]").forEach((element) => {
+      element.textContent = `${Math.round((topCategory.value / data.headline.findings) * 100)}%`;
+    });
+  }
 
   document.querySelectorAll("[data-publication-label]").forEach((element) => {
     element.textContent = data.publication.label;
@@ -268,18 +273,18 @@ function renderData(data) {
   renderCases(data.case_studies);
   renderLimitations(data.limitations);
 
-  const serviceCanvas = document.querySelector("#service-outcomes-chart");
+  const sourceCanvas = document.querySelector("#record-sources-chart");
   const riskCanvas = document.querySelector("#risk-types-chart");
   const categoryCanvas = document.querySelector("#finding-categories-chart");
-  const riskTypes = data.candidate_risk_types.slice(0, 9);
+  const riskTypes = data.candidate_risk_types;
 
   state.chartRenderers = [
-    () => drawVerticalBars(serviceCanvas, data.service_outcomes),
+    () => drawVerticalBars(sourceCanvas, data.record_sources),
     () => drawHorizontalBars(riskCanvas, riskTypes),
     () => drawDonut(categoryCanvas, data.finding_categories),
   ];
   state.chartRenderers.forEach((render) => render());
-  renderLegend(document.querySelector("#service-outcomes-legend"), data.service_outcomes);
+  renderLegend(document.querySelector("#record-sources-legend"), data.record_sources);
   renderLegend(document.querySelector("#finding-categories-legend"), data.finding_categories);
 }
 
@@ -446,14 +451,24 @@ async function main() {
   setupNavigation();
   setupNetworkCanvas();
   setupResizeRendering();
+  if (window.location.protocol === "file:" && window.MCPSCOPE_PUBLIC_SUMMARY) {
+    state.data = window.MCPSCOPE_PUBLIC_SUMMARY;
+    renderData(state.data);
+    return;
+  }
   try {
     const response = await fetch(DATA_URL, { cache: "no-store" });
     if (!response.ok) throw new Error(`data request failed: ${response.status}`);
     state.data = await response.json();
     renderData(state.data);
   } catch (error) {
-    console.error(error);
-    showDataError();
+    if (window.MCPSCOPE_PUBLIC_SUMMARY) {
+      state.data = window.MCPSCOPE_PUBLIC_SUMMARY;
+      renderData(state.data);
+    } else {
+      console.error(error);
+      showDataError();
+    }
   }
 }
 

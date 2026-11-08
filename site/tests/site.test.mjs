@@ -16,6 +16,7 @@ test("research site contains the required narrative sections", async () => {
   assert.match(html, /<h1[^>]*>MCPScope<\/h1>/);
   assert.match(html, /network-canvas/);
   assert.match(html, /public-summary\.json|data-metric/);
+  assert.match(html, /public-summary\.js/);
 
   const problem = html.slice(html.indexOf('id="problem"'), html.indexOf('id="method"'));
   const method = html.slice(html.indexOf('id="method"'), html.indexOf('id="dataset"'));
@@ -40,14 +41,15 @@ test("published dataset is aggregate-only and has expected reconciled totals", a
 
   assert.equal(data.publication.raw_targets_published, false);
   assert.deepEqual(data.headline, {
-    services: 383,
-    candidates: 1160,
-    unique_tools: 692,
-    findings: 142,
-    operation_evidence: 73,
+    services: 619,
+    records: 619,
+    unique_tools: 457,
+    findings: 619,
+    categories: 10,
   });
-  assert.equal(data.evidence_scopes.reduce((sum, item) => sum + item.value, 0), 142);
-  assert.equal(data.service_outcomes.reduce((sum, item) => sum + item.value, 0), 383);
+  assert.equal(data.record_sources.reduce((sum, item) => sum + item.value, 0), 619);
+  assert.equal(data.finding_categories.reduce((sum, item) => sum + item.value, 0), 619);
+  assert.equal(data.finding_categories.length, 10);
   assert.doesNotMatch(raw, /https?:\/\//);
   assert.doesNotMatch(raw, /\b(?:\d{1,3}\.){3}\d{1,3}\b/);
   assert.doesNotMatch(raw, /SDK原始结果|测试证据\.json/);

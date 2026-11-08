@@ -10,6 +10,7 @@
   <meta property="og:type" content="website">
   <title>MCPScope | MCP 安全研究</title>
   <link rel="stylesheet" href="css/site.css">
+  <script src="data/public-summary.js" defer></script>
   <script src="js/main.js" defer></script>
 </head>
 <body>
@@ -54,20 +55,20 @@
 
       <div class="hero-metrics" aria-label="研究概览">
         <div class="hero-metric">
-          <strong data-metric="services">383</strong>
-          <span>高风险服务</span>
+          <strong data-metric="findings">619</strong>
+          <span>漏洞记录</span>
         </div>
         <div class="hero-metric">
-          <strong data-metric="candidates">1,160</strong>
-          <span>工具候选</span>
+          <strong data-metric="services">619</strong>
+          <span>涉及服务</span>
         </div>
         <div class="hero-metric">
-          <strong data-metric="findings">142</strong>
-          <span>证据支持的发现</span>
+          <strong data-metric="unique_tools">457</strong>
+          <span>不同工具名称</span>
         </div>
         <div class="hero-metric hero-metric-emphasis">
-          <strong data-metric="operation_evidence">73</strong>
-          <span>操作或影响证据</span>
+          <strong data-metric="categories">10</strong>
+          <span>风险能力类别</span>
         </div>
       </div>
     </section>
@@ -176,36 +177,36 @@
         <div class="section-heading heading-grid">
           <div>
             <p class="section-index">03 / 数据集</p>
-            <h2 id="dataset-title">383 个服务的风险审查快照</h2>
+            <h2 id="dataset-title">619 条记录的能力分布</h2>
           </div>
-          <p>公开页面仅使用脱敏聚合数据。原始地址、连接信息、响应内容、测试路径和可直接复现的载荷不会进入网站。</p>
+          <p>公开页面仅使用最新 CSV 的脱敏聚合数据。这些是能力筛选与复测记录，不把每条记录都表述为已完成影响验证。</p>
         </div>
 
         <div class="dataset-strip">
-          <div><span>不同工具名称</span><strong data-metric="unique_tools">692</strong></div>
-          <div><span>平均候选 / 服务</span><strong>3.03</strong></div>
-          <div><span>严重风险候选</span><strong data-severity="严重">363</strong></div>
-          <div><span>高风险候选</span><strong data-severity="高">797</strong></div>
+          <div><span>不同工具名称</span><strong data-metric="unique_tools">457</strong></div>
+          <div><span>平均记录 / 服务</span><strong>1.00</strong></div>
+          <div><span>无认证扫描累计</span><strong data-source="无认证扫描累计">559</strong></div>
+          <div><span>IP 地址工具数据</span><strong data-source="IP 地址工具数据">44</strong></div>
         </div>
 
         <div class="chart-grid chart-grid-wide">
           <figure class="chart-figure">
             <div class="figure-heading">
-              <div><span>服务结果</span><h3>授权测试后的服务状态</h3></div>
-              <span class="figure-unit">服务数</span>
+              <div><span>记录来源</span><h3>最新数据的来源分布</h3></div>
+              <span class="figure-unit">记录数</span>
             </div>
-            <canvas id="service-outcomes-chart" class="data-chart" role="img" aria-label="授权测试后的服务状态柱状图"></canvas>
-            <div class="chart-legend" id="service-outcomes-legend"></div>
-            <figcaption>每个服务只计入一个最终状态，避免多个候选工具重复计算。</figcaption>
+            <canvas id="record-sources-chart" class="data-chart" role="img" aria-label="最新漏洞记录来源分布柱状图"></canvas>
+            <div class="chart-legend" id="record-sources-legend"></div>
+            <figcaption>三种来源共同构成 619 条最新记录，不公开原始地址或请求证据。</figcaption>
           </figure>
 
           <figure class="chart-figure">
             <div class="figure-heading">
-              <div><span>能力覆盖</span><h3>高风险工具候选类型</h3></div>
-              <span class="figure-unit">候选数</span>
+              <div><span>能力分类</span><h3>漏洞记录的工具类别</h3></div>
+              <span class="figure-unit">记录数</span>
             </div>
-            <canvas id="risk-types-chart" class="data-chart chart-tall" role="img" aria-label="高风险工具候选类型横向柱状图"></canvas>
-            <figcaption>一项工具可能同时命中多个风险类型，因此分类计数之和可能高于候选总数。</figcaption>
+            <canvas id="risk-types-chart" class="data-chart chart-tall" role="img" aria-label="漏洞记录的工具类别横向柱状图"></canvas>
+            <figcaption>每条最新记录有一个工具功能分类，十类合计为 619 条。</figcaption>
           </figure>
         </div>
       </div>
@@ -216,46 +217,52 @@
         <div class="section-heading heading-grid">
           <div>
             <p class="section-index">04 / 发现</p>
-            <h2 id="findings-title">142 个发现，三种证据强度</h2>
+            <h2 id="findings-title">619 条记录，十类能力风险</h2>
           </div>
-          <p>研究结论不把“可以调用”和“已经造成影响”混为一谈。证据等级决定对外措辞，也决定后续复核优先级。</p>
+          <p>这一版公开数据展示能力筛选记录，先说清“发现了什么”，再区分哪些结论已经进入授权影响验证。</p>
         </div>
 
-        <div class="evidence-grid" id="evidence-grid" aria-label="证据等级">
+        <div class="evidence-grid" id="evidence-grid" aria-label="记录概览">
           <article class="evidence-level evidence-level-strong">
-            <div><span>LEVEL A</span><strong data-evidence="操作或影响证据">73</strong></div>
-            <h3>操作或影响证据</h3>
-            <p>获得与受控测试意图一致的结果，或确认敏感信息、后端操作等实际影响。</p>
-            <div class="evidence-meter"><span style="width:51.4%"></span></div>
+            <div><span>RECORDS</span><strong data-metric="findings">619</strong></div>
+            <h3>总记录</h3>
+            <p>按最新 CSV 的工具记录计数，不代表每条记录都已完成影响验证。</p>
+            <div class="evidence-meter"><span style="width:100%"></span></div>
           </article>
           <article class="evidence-level evidence-level-reach">
-            <div><span>LEVEL B</span><strong data-evidence="匿名调用可达">63</strong></div>
-            <h3>匿名调用可达</h3>
-            <p>请求已进入工具后端或业务校验，但尚未证明最终状态改变或敏感数据返回。</p>
-            <div class="evidence-meter"><span style="width:44.4%"></span></div>
+            <div><span>NO AUTH</span><strong data-source="无认证扫描累计">559</strong></div>
+            <h3>无认证扫描累计</h3>
+            <p>来自最新数据中的无认证扫描累计记录，应以能力候选而非影响结论理解。</p>
+            <div class="evidence-meter"><span style="width:90.3%"></span></div>
           </article>
           <article class="evidence-level evidence-level-review">
-            <div><span>REVIEW</span><strong data-evidence="认证结论待复核">6</strong></div>
-            <h3>认证结论待复核</h3>
-            <p>人工结果显示认证要求，与自动标记存在冲突，不纳入已验证影响结论。</p>
-            <div class="evidence-meter"><span style="width:4.2%"></span></div>
+            <div><span>IP TOOLS</span><strong data-source="IP 地址工具数据">44</strong></div>
+            <h3>IP 地址工具数据</h3>
+            <p>记录来自 IP 地址工具数据，仍需在授权范围内复核具体认证与影响。</p>
+            <div class="evidence-meter"><span style="width:7.1%"></span></div>
+          </article>
+          <article class="evidence-level evidence-level-review">
+            <div><span>CURL RECHECK</span><strong data-source="Curl 协议复测">16</strong></div>
+            <h3>Curl 协议复测</h3>
+            <p>这些记录来自协议复测，仅表示数据来源，不代表影响强度。</p>
+            <div class="evidence-meter"><span style="width:2.6%"></span></div>
           </article>
         </div>
 
         <div class="chart-grid findings-chart-grid">
           <figure class="chart-figure category-figure">
             <div class="figure-heading">
-              <div><span>最终分类</span><h3>证据支持的发现类别</h3></div>
-              <span class="figure-unit">发现数</span>
+              <div><span>能力类别</span><h3>记录的工具功能分布</h3></div>
+              <span class="figure-unit">记录数</span>
             </div>
-            <canvas id="finding-categories-chart" class="data-chart" role="img" aria-label="证据支持的发现类别环形图"></canvas>
+            <canvas id="finding-categories-chart" class="data-chart" role="img" aria-label="漏洞记录的工具功能分布环形图"></canvas>
             <div class="chart-legend category-legend" id="finding-categories-legend"></div>
           </figure>
           <div class="finding-statement">
             <p class="statement-label">KEY OBSERVATION</p>
-            <p class="statement-text">服务管理与外部操作占最终分类的 <strong>57%</strong>，说明风险不仅来自命令执行和数据库访问，也来自看似普通但能够改变外部状态的业务工具。</p>
+            <p class="statement-text"><span data-top-category-label>文件与内容存储</span>占全部记录的 <strong data-top-category-percent>31%</strong>，是最常见的能力类别。</p>
             <div class="statement-rule"></div>
-            <p class="statement-note">因此，能力聚类和副作用识别与传统关键词同样重要。</p>
+            <p class="statement-note">这些记录反映能力暴露范围，不取代授权测试和影响复核。</p>
           </div>
         </div>
       </div>

@@ -719,7 +719,7 @@ canvas {
   margin-bottom: 84px;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .evidence-level {
@@ -734,6 +734,10 @@ canvas {
 
 .evidence-level:last-child {
   padding-right: 0;
+  border-right: 0;
+}
+
+.evidence-level:nth-child(4) {
   border-right: 0;
 }
 
@@ -1159,6 +1163,23 @@ canvas {
 
   .chart-grid {
     gap: 72px;
+  }
+
+  .evidence-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .evidence-level:nth-child(2) {
+    border-right: 0;
+  }
+
+  .evidence-level:nth-child(3),
+  .evidence-level:nth-child(4) {
+    border-top: 1px solid var(--line);
+  }
+
+  .evidence-level:nth-child(3) {
+    border-right: 1px solid var(--line);
   }
 
   .category-figure {
