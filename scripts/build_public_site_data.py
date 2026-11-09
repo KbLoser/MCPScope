@@ -3,11 +3,13 @@ from __future__ import annotations
 
 import argparse
 import csv
+import ipaddress
 import json
 import re
 from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
+from urllib.parse import urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,7 +27,7 @@ DEFAULT_GEOGRAPHY = (
     ROOT.parent.parent
     / "获取工具列表"
     / "18_手动测试结果合并_2026-07-23"
-    / "MCP功能分类抽样_619个不同主机_含IP地区.csv"
+    / "619漏洞情况.csv"
 )
 DEFAULT_GEOGRAPHY_OUTPUT = ROOT / "site" / "data" / "public-geography.json"
 DEFAULT_GEOGRAPHY_FALLBACK = ROOT / "site" / "data" / "public-geography.js"
@@ -224,6 +226,35 @@ def redact_tool_name(name: str) -> str:
     return f"{value[0]}***{value[-1]}"
 
 
+def redact_target(row: Dict[str, str]) -> str:
+    hostname = row.get("标准主机名", "").strip().strip("[]")
+    if not hostname:
+        raw_target = row.get("目标地址 (IP/URL)", "").strip()
+        try:
+            hostname = (urlsplit(raw_target if "://" in raw_target else f"//{raw_target}").hostname or "").strip()
+        except ValueError:
+            hostname = ""
+    if not hostname:
+        return "未提供"
+
+    try:
+        address = ipaddress.ip_address(hostname)
+    except ValueError:
+        labels = [label for label in hostname.rstrip(".").split(".") if label]
+        if not labels:
+            return "未提供"
+        if len(labels) == 1:
+            return redact_tool_name(labels[0])
+        masked = [redact_tool_name(label) for label in labels[:-1]]
+        suffix = labels[-1] if labels[-1].isalpha() and len(labels[-1]) <= 6 else redact_tool_name(labels[-1])
+        return ".".join([*masked, suffix])
+
+    if address.version == 4:
+        return f"{str(address).split('.')[0]}.*.*.*"
+    first_group = address.exploded.split(":", 1)[0]
+    return f"{first_group}:****:****:****:****:****:****:****"
+
+
 def build_public_records(vulnerabilities: List[Dict[str, str]]) -> Dict[str, Any]:
     records = []
     for index, row in enumerate(vulnerabilities, start=1):
@@ -231,6 +262,7 @@ def build_public_records(vulnerabilities: List[Dict[str, str]]) -> Dict[str, Any
             {
                 "record_id": f"V-{index:04d}",
                 "masked_tool_name": redact_tool_name(row.get("工具名称 (Tool Name)", "")),
+                "masked_target": redact_target(row),
                 "category": row.get("工具功能分类", "").strip(),
                 "source": SOURCE_LABELS.get(row.get("数据来源", "").strip(), "其他来源"),
             }
@@ -310,7 +342,11 @@ def validate_public_geography(document: Dict[str, Any]) -> None:
         raise ValueError("public geography contains city-level data")
 
 
-def validate_public_records(document: Dict[str, Any], raw_tool_names: Iterable[str] = ()) -> None:
+def validate_public_records(
+    document: Dict[str, Any],
+    raw_tool_names: Iterable[str] = (),
+    raw_hostnames: Iterable[str] = (),
+) -> None:
     serialized = json.dumps(document, ensure_ascii=False)
     if re.search(r"https?://|\b(?:\d{1,3}\.){3}\d{1,3}\b", serialized):
         raise ValueError("public records contain a network address")
@@ -324,6 +360,10 @@ def validate_public_records(document: Dict[str, Any], raw_tool_names: Iterable[s
     for raw_name in raw_tool_names:
         if raw_name and raw_name in masked_names:
             raise ValueError("public records contain a raw tool name")
+    masked_targets = {record.get("masked_target", "") for record in document["records"]}
+    for raw_hostname in raw_hostnames:
+        if raw_hostname and raw_hostname in masked_targets:
+            raise ValueError("public records contain a raw hostname")
 
 
 def validate_public_summary(document: Dict[str, Any]) -> None:
@@ -367,7 +407,11 @@ def main() -> int:
     geography_rows = read_csv(args.geography) if args.geography.exists() else vulnerabilities
     geography = build_public_geography(geography_rows)
     validate_public_summary(document)
-    validate_public_records(records, (row.get("工具名称 (Tool Name)", "") for row in read_csv(args.vulnerabilities)))
+    validate_public_records(
+        records,
+        (row.get("工具名称 (Tool Name)", "") for row in vulnerabilities),
+        (row.get("标准主机名", "") for row in vulnerabilities),
+    )
     validate_public_geography(geography)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     serialized = json.dumps(document, ensure_ascii=False, indent=2)

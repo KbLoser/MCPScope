@@ -41,6 +41,8 @@ test("redacted record page publishes only masked tool names", async () => {
   assert.match(html, /public-geography\.js/);
   assert.equal(data.records.length, 619);
   assert.ok(data.records.every((record) => /\*{3,}/.test(record.masked_tool_name)));
+  assert.ok(data.records.every((record) => record.masked_target && /\*/.test(record.masked_target)));
+  assert.equal(data.records[0].masked_target, "m***p.w***e.c***p.a***e.com");
   assert.doesNotMatch(raw, /https?:\/\//);
   assert.doesNotMatch(raw, /"(?:mcp_id|tool_id|target|hostname|raw_tool_name)"/);
   assert.equal(geography.totals.records, 619);

@@ -8,10 +8,10 @@
   <title>脱敏记录 | MCPScope</title>
   <link rel="stylesheet" href="css/site.css">
   <link rel="stylesheet" href="css/records.css">
-  <script src="data/public-records.js?v=0584b12" defer></script>
-  <script src="data/public-geography.js?v=0584b12" defer></script>
-  <script src="data/world-map.js?v=0584b12" defer></script>
-  <script src="js/records.js?v=0584b12" defer></script>
+  <script src="data/public-records.js?v=masked-targets-1" defer></script>
+  <script src="data/public-geography.js?v=masked-targets-1" defer></script>
+  <script src="data/world-map.js?v=masked-targets-1" defer></script>
+  <script src="js/records.js?v=masked-targets-1" defer></script>
 </head>
 <body class="records-page">
   <a class="skip-link" href="#main">跳到主要内容</a>
@@ -44,7 +44,7 @@
         <a class="back-link" href="index.html#findings">← 返回研究发现</a>
         <p class="eyebrow">REDACTED VULNERABILITY RECORDS</p>
         <h1 id="records-title">619 条脱敏记录</h1>
-        <p class="records-lede">逐条展示工具能力分类、数据来源和脱敏工具名。目标地址、mcp_id、工具 ID、原始名称、请求与响应均不公开。</p>
+        <p class="records-lede">逐条展示脱敏工具名、掩码目标、能力分类和数据来源。完整目标地址、mcp_id、工具 ID、原始名称、请求与响应均不公开。</p>
 
         <div class="records-stats" aria-label="记录概览">
           <div><strong id="total-count">619</strong><span>全部记录</span></div>
@@ -98,13 +98,13 @@
             <p class="section-index">RECORD INDEX</p>
             <h2 id="records-list-title">按类别浏览</h2>
           </div>
-          <p>搜索只匹配脱敏后的记录编号与工具名，不会触达原始工具名称。</p>
+          <p>搜索只匹配脱敏后的记录编号、工具名和掩码目标，不会触达原始名称或完整地址。</p>
         </div>
 
         <div class="record-controls" role="search" aria-label="筛选脱敏记录">
           <label class="record-search">
             <span>搜索记录</span>
-            <input id="record-search" type="search" placeholder="例如 V-0001 或 j***s" autocomplete="off">
+            <input id="record-search" type="search" placeholder="例如 V-0001、j***s 或 m***p" autocomplete="off">
           </label>
           <label>
             <span>能力类别</span>
@@ -122,6 +122,9 @@
           <span id="page-status">第 1 / 26 页</span>
         </div>
 
+        <div class="record-columns" aria-hidden="true">
+          <span>记录</span><span>工具</span><span>掩码目标</span><span>能力类别</span><span>数据来源</span>
+        </div>
         <div class="record-list" id="record-list" aria-live="polite"></div>
         <p class="records-error" id="records-error" hidden>脱敏记录加载失败，请通过本地静态服务器或 GitHub Pages 访问。</p>
 
@@ -139,7 +142,7 @@
           <p class="section-index">PUBLICATION BOUNDARY</p>
           <h2 id="records-boundary-title">记录用于研究复核，不是可利用清单</h2>
         </div>
-        <p>本页只帮助读者理解记录的类别和来源。所有工具名称均经过遮蔽，原始目标、凭据、响应内容、请求参数和可直接复现的证据不在公开数据中。</p>
+        <p>本页只帮助读者理解记录的类别、来源和目标类型。工具名称与目标均经过遮蔽，完整地址、凭据、响应内容、请求参数和可直接复现的证据不在公开数据中。</p>
       </div>
     </section>
   </main>

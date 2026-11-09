@@ -120,6 +120,10 @@ function createRecordRow(record) {
   tool.className = "record-tool";
   tool.textContent = record.masked_tool_name;
 
+  const target = document.createElement("span");
+  target.className = "record-target";
+  target.textContent = record.masked_target;
+
   const category = document.createElement("span");
   category.className = "record-category";
   category.textContent = record.category;
@@ -128,7 +132,7 @@ function createRecordRow(record) {
   source.className = "record-source";
   source.textContent = record.source;
 
-  row.append(id, tool, category, source);
+  row.append(id, tool, target, category, source);
   return row;
 }
 
@@ -194,7 +198,7 @@ function applyFilters() {
   const category = document.querySelector("#category-filter").value;
   const source = document.querySelector("#source-filter").value;
   state.filtered = state.records.filter((record) => {
-    const matchesQuery = !query || `${record.record_id} ${record.masked_tool_name}`.toLowerCase().includes(query);
+    const matchesQuery = !query || `${record.record_id} ${record.masked_tool_name} ${record.masked_target}`.toLowerCase().includes(query);
     return matchesQuery && (!category || record.category === category) && (!source || record.source === source);
   });
   state.page = 1;

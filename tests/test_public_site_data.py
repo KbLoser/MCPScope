@@ -17,12 +17,14 @@ class PublicSiteDataTest(unittest.TestCase):
             {
                 "mcp_id": "1",
                 "工具名称 (Tool Name)": "shell",
+                "标准主机名": "api.example.com",
                 "工具功能分类": "主机与代码执行",
                 "数据来源": "无认证扫描累计",
             },
             {
                 "mcp_id": "2",
                 "工具名称 (Tool Name)": "read_file",
+                "标准主机名": "192.0.2.18",
                 "工具功能分类": "文件与内容存储",
                 "数据来源": "IP地址工具数据",
             },
@@ -41,6 +43,8 @@ class PublicSiteDataTest(unittest.TestCase):
         MODULE.validate_public_records(records)
         self.assertEqual(len(records["records"]), 2)
         self.assertTrue(all("***" in item["masked_tool_name"] for item in records["records"]))
+        self.assertEqual(records["records"][0]["masked_target"], "a***i.e***e.com")
+        self.assertEqual(records["records"][1]["masked_target"], "192.*.*.*")
         self.assertNotIn("shell", json.dumps(records, ensure_ascii=False))
 
     def test_redaction_guard_rejects_network_addresses(self):
