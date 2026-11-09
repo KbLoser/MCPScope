@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#10231d">
   <title>脱敏记录 | MCPScope</title>
   <link rel="stylesheet" href="css/site.css">
-  <link rel="stylesheet" href="css/records.css">
+  <link rel="stylesheet" href="css/records.css?v=row-layout-1">
   <script src="data/public-records.js?v=masked-targets-1" defer></script>
   <script src="data/public-geography.js?v=masked-targets-1" defer></script>
   <script src="data/world-map.js?v=masked-targets-1" defer></script>
@@ -122,10 +122,12 @@
           <span id="page-status">第 1 / 26 页</span>
         </div>
 
-        <div class="record-columns" aria-hidden="true">
-          <span>记录</span><span>工具</span><span>掩码目标</span><span>能力类别</span><span>数据来源</span>
+        <div class="record-table" role="region" aria-label="脱敏记录表格" tabindex="0">
+          <div class="record-columns" aria-hidden="true">
+            <span>记录</span><span>工具</span><span>掩码目标</span><span>能力类别</span><span>数据来源</span>
+          </div>
+          <div class="record-list" id="record-list" aria-live="polite"></div>
         </div>
-        <div class="record-list" id="record-list" aria-live="polite"></div>
         <p class="records-error" id="records-error" hidden>脱敏记录加载失败，请通过本地静态服务器或 GitHub Pages 访问。</p>
 
         <nav class="pagination" aria-label="记录分页">

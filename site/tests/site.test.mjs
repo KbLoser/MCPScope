@@ -39,6 +39,7 @@ test("redacted record page publishes only masked tool names", async () => {
   assert.match(html, /public-records\.js/);
   assert.match(html, /world-map/);
   assert.match(html, /public-geography\.js/);
+  assert.match(html, /record-table/);
   assert.equal(data.records.length, 619);
   assert.ok(data.records.every((record) => /\*{3,}/.test(record.masked_tool_name)));
   assert.ok(data.records.every((record) => record.masked_target && /\*/.test(record.masked_target)));
@@ -85,7 +86,10 @@ test("published dataset is aggregate-only and has expected reconciled totals", a
 
 test("site styling avoids gradients and unstable viewport-scaled type", async () => {
   const css = await readFile(path.join(siteRoot, "css", "site.css"), "utf8");
+  const recordsCss = await readFile(path.join(siteRoot, "css", "records.css"), "utf8");
   assert.doesNotMatch(css, /gradient\s*\(/i);
   assert.doesNotMatch(css, /font-size\s*:[^;]*(?:vw|vh)/i);
   assert.doesNotMatch(css, /letter-spacing\s*:\s*-/i);
+  assert.match(recordsCss, /\.record-source\s*\{[^}]*white-space:\s*nowrap/s);
+  assert.match(recordsCss, /\.record-table\s*\{[^}]*overflow-x:\s*auto/s);
 });
